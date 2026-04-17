@@ -3154,21 +3154,23 @@ function updateInfoPanel() {
     const events = [];
 
     const toMins = t => t ? t.getUTCHours()*60 + t.getUTCMinutes() : Infinity;
+    const dateUTC = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    const isNextDay = t => t && Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()) > dateUTC;
 
     if (showSun) {
       const s = getRiseSet(latA, lonA, date, 'sun');
-      if (s.rise && s.riseAz) events.push({ mins: toMins(s.rise), label: 'Sunrise',  time: fmtTime(s.rise), az: s.riseAz, key: 'sunRise',  lineColor: '#f59e0b' });
-      if (s.set  && s.setAz)  events.push({ mins: toMins(s.set),  label: 'Sunset',   time: fmtTime(s.set),  az: s.setAz,  key: 'sunSet',   lineColor: '#ea580c' });
+      if (s.rise && s.riseAz) events.push({ mins: toMins(s.rise), label: 'Sunrise',  time: fmtTime(s.rise), nextDay: isNextDay(s.rise), az: s.riseAz, key: 'sunRise',  lineColor: '#f59e0b' });
+      if (s.set  && s.setAz)  events.push({ mins: toMins(s.set),  label: 'Sunset',   time: fmtTime(s.set),  nextDay: isNextDay(s.set),  az: s.setAz,  key: 'sunSet',   lineColor: '#ea580c' });
     }
     if (showMoon) {
       const m = getRiseSet(latA, lonA, date, 'moon');
-      if (m.rise && m.riseAz) events.push({ mins: toMins(m.rise), label: 'Moonrise', time: fmtTime(m.rise), az: m.riseAz, key: 'moonRise', lineColor: '#c084fc' });
-      if (m.set  && m.setAz)  events.push({ mins: toMins(m.set),  label: 'Moonset',  time: fmtTime(m.set),  az: m.setAz,  key: 'moonSet',  lineColor: '#8b5cf6' });
+      if (m.rise && m.riseAz) events.push({ mins: toMins(m.rise), label: 'Moonrise', time: fmtTime(m.rise), nextDay: isNextDay(m.rise), az: m.riseAz, key: 'moonRise', lineColor: '#c084fc' });
+      if (m.set  && m.setAz)  events.push({ mins: toMins(m.set),  label: 'Moonset',  time: fmtTime(m.set),  nextDay: isNextDay(m.set),  az: m.setAz,  key: 'moonSet',  lineColor: '#8b5cf6' });
     }
     {
       const mw = getRiseSet(latA, lonA, date, 'mw');
-      if (mw.rise && mw.riseAz) events.push({ mins: toMins(mw.rise), label: 'MW Rise', time: fmtTime(mw.rise), az: mw.riseAz, key: 'mwRise', lineColor: '#22c55e' });
-      if (mw.set  && mw.setAz)  events.push({ mins: toMins(mw.set),  label: 'MW Set',  time: fmtTime(mw.set),  az: mw.setAz,  key: 'mwSet',  lineColor: '#14b8a6' });
+      if (mw.rise && mw.riseAz) events.push({ mins: toMins(mw.rise), label: 'MW Rise', time: fmtTime(mw.rise), nextDay: isNextDay(mw.rise), az: mw.riseAz, key: 'mwRise', lineColor: '#22c55e' });
+      if (mw.set  && mw.setAz)  events.push({ mins: toMins(mw.set),  label: 'MW Set',  time: fmtTime(mw.set),  nextDay: isNextDay(mw.set),  az: mw.setAz,  key: 'mwSet',  lineColor: '#14b8a6' });
     }
 
     // Sort chronologically
@@ -3184,7 +3186,7 @@ function updateInfoPanel() {
       return `<button class="az-toggle-btn${active?' active':''}" onclick="toggleStripEvent('${ev.key}')"
         ${active ? `style="border-color:${col};background:${col}1a"` : ''}>
         <span style="color:${col};font-weight:700;text-transform:uppercase;letter-spacing:.04em">${labelText}</span>
-        <span style="color:var(--text)">${ev.time}</span>
+        <span style="color:var(--text)">${ev.time}${ev.nextDay ? '<sup style="font-size:8px;opacity:0.7;margin-left:1px">+1</sup>' : ''}</span>
         <span style="color:${col}">Az ${ev.az.toFixed(1)}°</span>
       </button>`;
     }).join('');
