@@ -108,7 +108,7 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 #tide-canvas{height:55px;border-radius:3px;display:block;max-width:100%;box-sizing:border-box}
 #slider-readout{display:flex;gap:10px;font-size:11px;font-family:'Inter',sans-serif;margin-top:3px;flex-wrap:wrap;font-weight:500}
 .readout-sun{color:var(--sun-rise)}.readout-moon{color:var(--moon-rise)}.readout-mw{color:var(--mw)}
-#tide-readout{font-size:13px;font-family:'Inter',sans-serif;color:#38bdf8;margin-top:3px;font-weight:500;text-align:center;display:inline}
+#tide-readout{font-size:13px;font-family:'Inter',sans-serif;color:var(--text);margin-top:3px;font-weight:500;text-align:center;display:inline}
 #tide-station-info{font-size:12px;font-family:'Inter',sans-serif;color:#c8d0d8;text-align:center;display:inline;margin-left:8px;margin-top:2px;line-height:1.5;max-width:100%}
 #tide-station-info code{background:rgba(0,0,0,.15);padding:1px 4px;border-radius:3px;font-size:10px}
 #tide-station-info b{font-weight:600;color:var(--text)}
@@ -738,7 +738,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
       <div id="tide-graph-wrap" style="display:none;height:0;overflow:hidden;padding:0;margin:0">
         <div id="tide-left-block" style="display:none">
           <div id="tide-time" style="display:none"></div>
-          <div id="tide-readout" style="font-size:11px;font-weight:600;color:#38bdf8;white-space:nowrap"></div>
+          <div id="tide-readout" style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap"></div>
           <div id="tide-station-name" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;text-transform:uppercase;letter-spacing:.03em"></div>
           <div id="tide-station-info" style="font-size:10px;color:var(--muted);white-space:nowrap"></div>
         </div>
@@ -2234,10 +2234,9 @@ function updateTideStrip() {
   const sorted = [...tideHiLo].sort((a,b) => a.t - b.t);
   inner.innerHTML = sorted.map(pt => {
     const label = pt.type === 'H' ? '▲ High' : '▼ Low';
-    const color = pt.type === 'H' ? '#38bdf8' : '#818cf8';
     const timeStr = fmtTime(new Date(Date.UTC(getDate().getUTCFullYear(), getDate().getUTCMonth(), getDate().getUTCDate(), 0, pt.t, 0)));
     return `<div style="font-size:11px;font-family:'Inter',sans-serif;white-space:nowrap">
-      <span style="color:${color};font-weight:700;text-transform:uppercase;letter-spacing:.04em">${label}</span>
+      <span style="color:var(--text);font-weight:700;text-transform:uppercase;letter-spacing:.04em">${label}</span>
       <span style="color:var(--text);margin-left:4px">${timeStr} ${pt.v.toFixed(1)}ft</span>
     </div>`;
   }).join('');
@@ -2276,11 +2275,13 @@ function redrawTideHiLoCanvas() {
   const tX = t => TML + (t / 1440) * TGW;
 
   if (!tideHiLo) return;
+  const isLight = document.documentElement.classList.contains('light');
+  const hiLoColor = isLight ? '#24292f' : '#e6edf3';
   ctx.font = '10px Inter,sans-serif';
   for (const pt of tideHiLo) {
     const x = tX(pt.t);
     const isHigh = pt.type === 'H';
-    const color = isHigh ? '#38bdf8' : '#818cf8';
+    const color = hiLoColor;
     // Tick mark
     ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.7;
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 6); ctx.stroke();
@@ -2467,7 +2468,7 @@ function drawAltGraph() {
         const lbl = (isH ? '▲ ' : '▼ ') + pt.v.toFixed(1) + 'ft';
         const lw2 = ctx.measureText(lbl).width;
         const lx2 = Math.min(Math.max(toX(pt.lm) - lw2 / 2, ML), ML + GW - lw2);
-        ctx.fillStyle = isH ? 'rgba(56,189,248,0.95)' : 'rgba(56,189,248,0.65)';
+        ctx.fillStyle = document.documentElement.classList.contains('light') ? 'rgba(36,41,47,0.95)' : 'rgba(230,237,243,0.95)';
         ctx.fillText(lbl, lx2, isH ? tBot - 18 : tBot - 5);
       }
     }
@@ -2648,13 +2649,13 @@ function drawTideGraph() {
   // Hi/Lo labels
   if (tideHiLo) {
     ctx.font = '10px Inter,sans-serif';
+    const tideMarkerColor = document.documentElement.classList.contains('light') ? '#24292f' : '#e6edf3';
     for (const pt of tideHiLo) {
       const x = tX(pt.t), isH = pt.type === 'H';
-      const color = isH ? '#38bdf8' : '#818cf8';
       const lbl = (isH ? '▲ ' : '▼ ') + pt.v.toFixed(1) + 'ft';
       const lw = ctx.measureText(lbl).width;
       const lx = Math.min(Math.max(x - lw/2, ML), ML + GW - lw);
-      ctx.fillStyle = color;
+      ctx.fillStyle = tideMarkerColor;
       const ptY = tY(pt.v);
       // High: above peak. Low: pinned to bottom margin
       ctx.fillText(lbl, lx, isH ? Math.max(ptY - 5, 11) : H - 13);
