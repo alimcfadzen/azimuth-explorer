@@ -4470,6 +4470,8 @@ function toggleTheme() {
   if (btn) btn.textContent = isLight ? '🌙 Dark' : '☀ Light';
   saveState();
   drawAltGraph();
+  updateInfoPanel();
+  updateRiseSetStrip();
 }
 
 function toggleLibrary(openTab) {
