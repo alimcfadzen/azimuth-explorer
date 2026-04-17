@@ -212,6 +212,10 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 
 /* RISE/SET STRIP below timeline slider readout */
 #risesetstrip{font-size:10px;font-family:'Inter',sans-serif;display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+#risesetstrip span{display:inline-block;cursor:pointer;text-align:center;padding:3px 8px;border-radius:5px;line-height:1.4;user-select:none;transition:background .2s,border-color .2s,opacity .2s;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);opacity:1}
+#risesetstrip span.rs-off{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.08)!important;opacity:.35}
+html.light #risesetstrip span{background:rgba(0,0,0,.06);border:1px solid #d0d7de}
+html.light #risesetstrip span.rs-off{background:#eaeef2!important;border-color:#d0d7de!important;opacity:.5;color:#57606a!important}
 
 /* PIN MODE BAR */
 #pin-mode-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:8px;padding:5px 14px;z-index:600;font-size:12px;text-align:center;display:none;pointer-events:none}
@@ -3170,17 +3174,14 @@ function updateInfoPanel() {
     events.sort((a, b) => a.mins - b.mins);
 
     // Render each event as a toggle button
-    const isLightMode = document.documentElement.classList.contains('light');
     let sm = events.map(ev => {
       const isMoonEv = ev.label === 'Moonrise' || ev.label === 'Moonset';
       const moonIcon = `<span style="filter:drop-shadow(0 0 4px #c084fc);font-size:13px;line-height:1">${ph.icon}</span>`;
       const labelText = (isMoonEv && showMoon) ? `${moonIcon} ${ev.label}` : ev.label;
       const active = !hiddenEvents[ev.key];
       const col = ev.lineColor;
-      const inactiveBg = isLightMode ? '#eaeef2' : 'rgba(255,255,255,.04)';
-      const inactiveBorder = isLightMode ? '#d0d7de' : 'var(--border)';
       return `<button class="az-toggle-btn${active?' active':''}" onclick="toggleStripEvent('${ev.key}')"
-        style="border-color:${active?col:inactiveBorder};background:${active?col+'1a':inactiveBg}">
+        ${active ? `style="border-color:${col};background:${col}1a"` : ''}>
         <span style="color:${col};font-weight:700;text-transform:uppercase;letter-spacing:.04em">${labelText}</span>
         <span style="color:var(--text)">${ev.time}</span>
         <span style="color:${col}">Az ${ev.az.toFixed(1)}°</span>
@@ -4200,15 +4201,10 @@ function updateRiseSetStrip() {
 
   if (!events.length) { strip.innerHTML=''; if (cvs) { cvs.height=0; cvs.style.display='none'; } return; }
 
-  const light = document.documentElement.classList.contains('light');
   strip.innerHTML = events.map(ev => {
     const off = hiddenEvents[ev.key];
-    const bg  = light
-      ? (off ? 'background:#eaeef2;border:1px solid #d0d7de;' : `background:rgba(0,0,0,.06);border:1px solid #d0d7de;`)
-      : (off ? 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);' : 'background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);');
-    const opacity = off ? (light ? 0.5 : 0.35) : 1;
-    const color   = off && light ? '#57606a' : ev.color;
-    return `<span data-mins="${ev.mins}" data-key="${ev.key}" onclick="toggleStripEvent('${ev.key}')" style="${bg}color:${color};font-size:10px;font-family:'Inter',sans-serif;text-align:center;display:inline-block;cursor:pointer;opacity:${opacity};transition:all .2s;user-select:none;padding:3px 8px;border-radius:5px;line-height:1.4" title="Click to toggle on/off">`+
+    return `<span data-mins="${ev.mins}" data-key="${ev.key}" onclick="toggleStripEvent('${ev.key}')"
+      class="${off ? 'rs-off' : ''}" style="color:${ev.color}" title="Click to toggle on/off">`+
     `${ev.label}<br><b>${ev.timeStr}</b></span>`;
   }).join('');
 
