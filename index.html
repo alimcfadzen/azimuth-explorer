@@ -1406,6 +1406,12 @@ function setPinMode(which) {
   syncPinButtons();
 }
 
+function dropPOIIfFar(newLat, newLon) {
+  if (latB === null || latA === null) return;
+  const miles = distKm(latA, lonA, newLat, newLon) * 0.621371;
+  if (miles > 5) clearPin('b');
+}
+
 function cancelPinMode() {
   pinMode = null;
   document.getElementById('map').className = '';
@@ -1416,6 +1422,7 @@ function cancelPinMode() {
 function placeMarker(which, lat, lng) {
   // Will call drawAltGraph after to resize canvas with tide section
   if (which === 'a') {
+    dropPOIIfFar(lat, lng);
     latA = lat; lonA = lng;
     if (markerA) map.removeLayer(markerA);
     markerA = L.marker([lat, lng], {
@@ -1426,7 +1433,9 @@ function placeMarker(which, lat, lng) {
       yearCache = null; monthCache = null; redraw();
     });
     markerA.on('dragend', e => {
-      latA = e.target.getLatLng().lat; lonA = e.target.getLatLng().lng;
+      const newLat = e.target.getLatLng().lat, newLon = e.target.getLatLng().lng;
+      dropPOIIfFar(newLat, newLon);
+      latA = newLat; lonA = newLon;
       yearCache = null; monthCache = null; updateInfoPanel(); saveState();
       tideFetchKey = '';
       if (timelineActive) { loadTideForCurrentState(); updateTimeDisplay(); }
@@ -2734,11 +2743,13 @@ function showSearchResults(results) {
   const box = document.getElementById('search-results');
   box.innerHTML = results.map((r, i) => {
     if (!r.lat) return `<div class="sr-item" style="color:var(--muted)">${r.display_name}</div>`;
-    const parts = r.display_name.split(', ');
-    const name = parts.slice(0, 2).join(', ');
-    const sub  = parts.slice(2).join(', ');
-    return `<div class="sr-item" onclick="selectSearchResult(${r.lat},${r.lon},'${name.replace(/'/g,"\\'")}')">
-      ${name}<small>${sub}</small>
+    const a = r.address || {};
+    const place = a.city || a.town || a.village || a.hamlet || a.county || r.display_name.split(', ')[0];
+    const stateParts = [a.state, a.country !== 'United States' ? a.country : null].filter(Boolean);
+    const sub = stateParts.length ? stateParts.join(', ') : r.display_name.split(', ').slice(-2).join(', ');
+    const label = `${place}, ${stateParts[0] || ''}`.trim().replace(/,$/, '');
+    return `<div class="sr-item" onclick="selectSearchResult(${r.lat},${r.lon},'${label.replace(/'/g,"\\'")}')">
+      ${label}<small>${sub}</small>
     </div>`;
   }).join('');
   box.style.display = 'block'; box.style.borderTop = '1px solid var(--border)';
