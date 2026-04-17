@@ -3031,8 +3031,17 @@ function moonAltAz(jd,lat,lon) {
   const M= ((357.5291092+35999.0502909*T)  %360+360)%360;
   const Mp=((134.9633964+477198.8675055*T) %360+360)%360;
   const F= ((93.2720950 +483202.0175233*T) %360+360)%360;
-  const lonM=Lm+6.289*Math.sin(Mp*p)-1.274*Math.sin((2*D-Mp)*p)+0.658*Math.sin(2*D*p)-0.214*Math.sin(2*Mp*p)-0.186*Math.sin(M*p);
-  const latM=5.128*Math.sin(F*p)+0.280*Math.sin((Mp+F)*p)-0.277*Math.sin((Mp-F)*p)-0.173*Math.sin((2*D-F)*p);
+  const lonM=Lm
+    +6.289*Math.sin(Mp*p)   -1.274*Math.sin((2*D-Mp)*p) +0.658*Math.sin(2*D*p)
+    -0.214*Math.sin(2*Mp*p) -0.186*Math.sin(M*p)        -0.114*Math.sin(2*F*p)
+    +0.059*Math.sin((2*D-2*Mp)*p) +0.057*Math.sin((2*D-M-Mp)*p)
+    +0.053*Math.sin((2*D+Mp)*p)   +0.046*Math.sin((2*D-M)*p)
+    -0.041*Math.sin((Mp-M)*p)     +0.035*Math.sin(D*p)
+    -0.031*Math.sin((Mp+M)*p);
+  const latM=5.128*Math.sin(F*p)
+    +0.280*Math.sin((Mp+F)*p)     -0.277*Math.sin((Mp-F)*p)
+    -0.173*Math.sin((2*D-F)*p)    -0.055*Math.sin((2*D-Mp-F)*p)
+    +0.046*Math.sin((2*D+F)*p)    +0.033*Math.sin((Mp+2*F)*p);
   const eps=23.439*p, lonR=lonM*p, latR2=latM*p;
   const ra=Math.atan2(Math.sin(lonR)*Math.cos(eps)-Math.tan(latR2)*Math.sin(eps),Math.cos(lonR))*180/Math.PI;
   const dec=Math.asin(Math.sin(latR2)*Math.cos(eps)+Math.cos(latR2)*Math.sin(eps)*Math.sin(lonR));
