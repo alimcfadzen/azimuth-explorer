@@ -1357,12 +1357,23 @@ function syncPinButtons() {
     // No active placement mode
     btnA.className = latA ? 'btn pin-placed-a' : 'btn';
     btnA.textContent = latA ? '● Observer' : '⊕ Observer';
-    btnB.className = latB ? 'btn pin-placed-b' : 'btn';
-    btnB.textContent = latB ? '● POI' : '⊕ POI';
+    if (latA === null) {
+      btnB.className = 'btn';
+      btnB.textContent = '⊕ POI';
+      btnB.style.opacity = '0.4';
+      btnB.style.cursor = 'not-allowed';
+    } else {
+      btnB.className = latB ? 'btn pin-placed-b' : 'btn';
+      btnB.textContent = latB ? '● POI' : '⊕ POI';
+      btnB.style.opacity = '';
+      btnB.style.cursor = '';
+    }
   }
 }
 
 function togglePin(which) {
+  if (which === 'b' && latA === null) return; // POI requires Observer first
+
   if (pinMode === which) {
     // Currently in placing mode for this pin — cancel
     pinMode = null;
@@ -2735,8 +2746,10 @@ function showSearchResults(results) {
 
 function selectSearchResult(lat, lon, name) {
   jumpToLocation(parseFloat(lat), parseFloat(lon), name);
-  document.getElementById('search-input').value = name;
+  document.getElementById('search-input').value = '';
   closeSearchResults();
+  const menu = document.getElementById('dd-search-menu');
+  if (menu) menu.classList.remove('open');
 }
 
 function jumpToLocation(lat, lon, label) {
