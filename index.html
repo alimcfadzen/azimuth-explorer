@@ -2745,7 +2745,7 @@ function showSearchResults(results) {
   box.innerHTML = results.map((r, i) => {
     if (!r.lat) return `<div class="sr-item" style="color:var(--muted)">${r.display_name}</div>`;
     const a = r.address || {};
-    const place = r.name || r.display_name.split(', ')[0];
+    const place = r.display_name.split(', ')[0];
     const state = a.state || '';
     const country = (a.country && a.country !== 'United States') ? a.country : '';
     const sub = [state, country].filter(Boolean).join(', ') || r.display_name.split(', ').slice(1, 3).join(', ');
