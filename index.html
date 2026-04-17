@@ -45,7 +45,7 @@ html.light .spot-item,html.light .panel-item{background:transparent}
 html.light .spots-cat-btn{background:var(--bg3)}
 html.light #spots-search{background:var(--bg3);color:var(--text)}
 html.light .btn{background:var(--bg3);border-color:var(--border);color:var(--text)}
-html.light .az-toggle-btn:not(.active){opacity:0.7}
+html.light .az-toggle-btn:not(.active){opacity:0.7;background:transparent!important}
 html.light #tz-toggle-btn,html.light #fmt-24h-btn{background:var(--bg3)!important;border-color:var(--border)!important;color:var(--text)!important}
 html.light #time-slider{background:rgba(0,0,0,0.25)}
 html.light .btn:hover{border-color:#0969da;color:#0969da}
@@ -214,8 +214,8 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 #risesetstrip{font-size:10px;font-family:'Inter',sans-serif;display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
 #risesetstrip span{display:inline-block;cursor:pointer;text-align:center;padding:3px 8px;border-radius:5px;line-height:1.4;user-select:none;transition:background .2s,border-color .2s,opacity .2s;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);opacity:1}
 #risesetstrip span.rs-off{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.08)!important;opacity:.35}
-html.light #risesetstrip span{background:rgba(0,0,0,.06);border:1px solid #d0d7de}
-html.light #risesetstrip span.rs-off{background:#eaeef2!important;border-color:#d0d7de!important;opacity:.5;color:#57606a!important}
+html.light #risesetstrip span{background:transparent;border:1px solid #d0d7de}
+html.light #risesetstrip span.rs-off{background:transparent!important;border-color:#d0d7de!important;opacity:.5}
 
 /* PIN MODE BAR */
 #pin-mode-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:8px;padding:5px 14px;z-index:600;font-size:12px;text-align:center;display:none;pointer-events:none}
