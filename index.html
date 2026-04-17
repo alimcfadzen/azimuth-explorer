@@ -509,8 +509,10 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
         <button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
         <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
         <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="Library">📂 Library</button>
-        <button class="btn" id="btnTheme" onclick="toggleTheme()" title="Toggle light/dark mode">☀ Light</button>
       </div>
+
+      <!-- THEME TOGGLE pushed to far right -->
+      <button class="btn" id="btnTheme" onclick="toggleTheme()" title="Toggle light/dark mode" style="margin-left:auto">☀ Light</button>
 
       <!-- hidden btns kept for JS compat -->
       <button style="display:none" id="btnSun"></button>
