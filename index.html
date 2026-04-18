@@ -3469,12 +3469,12 @@ function updateInfoPanel() {
     const selectedLocalDay = toLocalDay(date);
     const isNextDay = t => t && toLocalDay(t) > selectedLocalDay;
 
-    if (showSun) {
+    {
       const s = getRiseSet(latA, lonA, date, 'sun');
       if (s.rise && s.riseAz) events.push({ mins: toMins(s.rise), label: 'Sunrise',  time: fmtTime(s.rise), nextDay: isNextDay(s.rise), az: s.riseAz, key: 'sunRise',  lineColor: '#f59e0b' });
       if (s.set  && s.setAz)  events.push({ mins: toMins(s.set),  label: 'Sunset',   time: fmtTime(s.set),  nextDay: isNextDay(s.set),  az: s.setAz,  key: 'sunSet',   lineColor: '#ea580c' });
     }
-    if (showMoon) {
+    {
       const m = getRiseSet(latA, lonA, date, 'moon');
       if (m.rise && m.riseAz) events.push({ mins: toMins(m.rise), label: 'Moonrise', time: fmtTime(m.rise), nextDay: isNextDay(m.rise), az: m.riseAz, key: 'moonRise', lineColor: '#c084fc' });
       if (m.set  && m.setAz)  events.push({ mins: toMins(m.set),  label: 'Moonset',  time: fmtTime(m.set),  nextDay: isNextDay(m.set),  az: m.setAz,  key: 'moonSet',  lineColor: '#8b5cf6' });
