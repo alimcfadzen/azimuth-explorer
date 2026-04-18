@@ -210,12 +210,16 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 /* AZ FINDER */
 #az-panel{position:absolute;right:14px;background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:10px;padding:12px 14px;z-index:500;width:218px;backdrop-filter:blur(10px);display:none}
 #az-panel h3{font-size:10px;font-family:'Inter',sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+#body-az{overflow-y:auto!important}
+#altHeight,#altDist,#altHeightUnit,#altDistUnit{font-size:10px!important}
 .az-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
 .az-row label{font-size:11px;color:var(--muted);width:58px;flex-shrink:0}
 .az-row input,.az-row select{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif}
 #azDeg::-webkit-inner-spin-button,#azDeg::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 #azDeg{-moz-appearance:textfield}
 .az-row select option{background:var(--bg2)}
+#altHeightUnit,#altDistUnit{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 5px;border-radius:5px;font-size:11px;font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none}
+#altHeight,#altDist{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 5px;border-radius:5px;font-family:'Inter',sans-serif;font-size:10px}
 #az-find-btn{width:100%;padding:5px;background:var(--accent);color:#000;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:2px}
 #az-find-btn:hover{background:#79bcff}
 #az-results{margin-top:7px;max-height:140px;overflow-y:auto;font-size:11px}
@@ -773,7 +777,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
           <button class="panel-close" onclick="event.stopPropagation();toggleAzFinder()">✕</button>
         </div>
       </div>
-      <div class="panel-body" id="body-az" style="max-height:calc(100vh - 120px);overflow-y:auto">
+      <div class="panel-body" id="body-az" style="max-height:calc(100vh - 120px)">
       <div class="az-row">
         <label>Azimuth</label>
         <input type="number" id="azDeg" min="0" max="360" step="0.5" placeholder="0–360">
@@ -805,39 +809,37 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       </div>
 
       <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:2px">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Target Altitude</div>
-        <div class="az-row">
+        <div class="az-section-label" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Target Altitude</div>
+        <div id="alt-height-toggle" onclick="toggleAltHeightCalc()" style="font-size:10px;color:var(--muted);cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px;margin-bottom:5px">
+          <span id="alt-height-arrow">▾</span>
+          <span>Calculate from height &amp; distance</span>
+        </div>
+        <div id="alt-height-calc" style="display:block;margin-bottom:6px">
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
+            <input type="number" id="altHeight" min="0" step="1" placeholder="Height" oninput="calcAltFromHeight()" style="width:58px">
+            <select id="altHeightUnit" onchange="calcAltFromHeight()">
+              <option value="ft">ft</option>
+              <option value="m">m</option>
+            </select>
+            <span style="font-size:10px;color:var(--muted)">at</span>
+            <input type="number" id="altDist" min="0" step="0.1" placeholder="Distance" oninput="calcAltFromHeight()" style="width:72px">
+            <select id="altDistUnit" onchange="calcAltFromHeight()">
+              <option value="mi">mi</option>
+              <option value="km">km</option>
+              <option value="ft">ft</option>
+              <option value="m">m</option>
+            </select>
+          </div>
+          <div id="alt-height-result" style="font-size:10px;color:var(--accent);min-height:13px;margin-bottom:0"></div>
+          <div class="az-subdesc" style="font-size:9px;color:var(--muted);line-height:1.4;margin-bottom:10px">Height of target above your eye level; distance along the ground.</div>
+        </div>
+        <div class="az-row" style="margin-bottom:4px">
           <label>Altitude</label>
           <input type="number" id="altDeg" min="-90" max="90" step="0.001" value="0" style="width:70px">
           <span style="font-size:10px;color:var(--muted)">° above horizon</span>
         </div>
-        <div style="margin-top:5px">
-          <div id="alt-height-toggle" onclick="toggleAltHeightCalc()" style="font-size:10px;color:var(--muted);cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px">
-            <span id="alt-height-arrow">▸</span>
-            <span>Calculate from height &amp; distance</span>
-          </div>
-          <div id="alt-height-calc" style="display:none;margin-top:6px">
-            <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
-              <input type="number" id="altHeight" min="0" step="1" placeholder="Height" oninput="calcAltFromHeight()" style="width:58px;font-size:11px">
-              <select id="altHeightUnit" onchange="calcAltFromHeight()" style="font-size:10px;padding:2px 2px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px">
-                <option value="ft">ft</option>
-                <option value="m">m</option>
-              </select>
-              <span style="font-size:10px;color:var(--muted)">at</span>
-              <input type="number" id="altDist" min="0" step="0.1" placeholder="Dist" oninput="calcAltFromHeight()" style="width:52px;font-size:11px">
-              <select id="altDistUnit" onchange="calcAltFromHeight()" style="font-size:10px;padding:2px 2px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px">
-                <option value="mi">mi</option>
-                <option value="km">km</option>
-                <option value="ft">ft</option>
-                <option value="m">m</option>
-              </select>
-            </div>
-            <div id="alt-height-result" style="font-size:10px;color:var(--accent);min-height:13px;margin-bottom:2px"></div>
-            <div style="font-size:9px;color:var(--muted);line-height:1.4">Height of target above your eye level; distance along the ground.</div>
-          </div>
-        </div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-top:5px;margin-bottom:6px">
-          Enter an angle, or calculate one from height &amp; distance above. 0° = horizon, e.g. 8° for a lighthouse top.
+        <div class="az-desc" style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:6px">
+          Enter an angle directly. 0° = horizon, e.g. 8° for a lighthouse top.
         </div>
         <div id="alt-result" style="font-size:11px;font-family:'Inter',sans-serif;color:var(--accent);min-height:14px;margin-bottom:6px"></div>
       </div>
@@ -857,6 +859,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <div id="alt-graph-wrap" style="position:relative">
         <canvas id="alt-canvas"></canvas>
         <div id="time-info-block">
+          <div id="slider-date-display" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;line-height:1.2;white-space:nowrap;letter-spacing:.03em"></div>
           <div id="time-display"></div>
           <div style="display:flex;gap:4px">
             <button id="tz-toggle-btn" onclick="toggleTimezone()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--muted);padding:1px 6px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">→ UTC</button>
@@ -1124,8 +1127,8 @@ function applyState(s) {
   // Restore hidden events
   if (s.hiddenEvents) Object.assign(hiddenEvents, s.hiddenEvents);
 
-  // Theme — default to light for new users (s.lightMode undefined → treat as true)
-  if (s.lightMode !== false) {
+  // Theme — default to dark for new users (s.lightMode undefined → treat as false)
+  if (s.lightMode === true) {
     document.documentElement.classList.add('light');
     const btn = document.getElementById('btnTheme');
     if (btn) btn.textContent = '🌙 Dark';
@@ -1886,6 +1889,12 @@ function toggle24h() {
 }
 
 function updateTimeDisplay() {
+  // Date above time
+  const sliderDateEl = document.getElementById('slider-date-display');
+  if (sliderDateEl) {
+    const d = getDate();
+    sliderDateEl.textContent = `${DATE_DAYS[d.getUTCDay()]} ${DATE_MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  }
   // Main time display
   document.getElementById('time-display').textContent = fmtSliderTime();
 
@@ -4509,6 +4518,7 @@ function updatePanelPositions() {
 }
 
 // ── AZIMUTH FINDER TOGGLE ─────────────────────────────────────────────────
+
 function toggleAzFinder() {
   const panel = document.getElementById('az-panel');
   const btn   = document.getElementById('btnAzFinder');
