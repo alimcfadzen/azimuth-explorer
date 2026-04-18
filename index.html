@@ -51,7 +51,39 @@ html.light .spot-item,html.light .panel-item{background:transparent}
 html.light .spots-cat-btn{background:var(--bg3)}
 html.light #spots-search{background:var(--bg3);color:var(--text)}
 html.light #spots-panel{background:rgba(246,248,250,.99)!important}
-html.light #spots-radius{background:var(--bg3);color:var(--text)}
+html.light #events-panel{background:rgba(246,248,250,.99)!important}
+#events-panel{
+  position:absolute;top:14px;left:50%;transform:translateX(-30%);
+  background:rgba(13,17,23,.96);border:1px solid var(--border);
+  border-radius:10px;z-index:600;width:480px;
+  max-height:calc(100% - 28px);display:none;flex-direction:column;
+  backdrop-filter:blur(12px);overflow:hidden;
+}
+#events-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+#events-panel-header h3{font-size:13px;font-weight:600;color:var(--text);margin:0}
+#events-panel-body{display:flex;flex-direction:column;padding:10px 14px;overflow:hidden;flex:1;min-height:0}
+#events-list{overflow-y:auto;flex:1;min-height:0}
+.event-item{padding:7px 9px;border-radius:6px;border:1px solid var(--border);margin-bottom:5px;display:flex;gap:8px;align-items:flex-start}
+.event-item.past{opacity:0.45}
+.event-item:last-child{margin-bottom:0}
+.event-date{font-size:10px;color:var(--muted);font-family:'Inter',sans-serif;white-space:nowrap;min-width:82px;padding-top:1px}
+.event-date.upcoming{color:#58a6ff}
+.event-body{flex:1;min-width:0}
+.event-name{font-size:12px;color:var(--text);font-weight:500;margin-bottom:2px}
+.event-note{font-size:10px;color:var(--muted);font-family:'Inter',sans-serif;margin-top:2px}
+.event-cat-badge{font-size:9px;padding:1px 6px;border-radius:8px;font-family:'Inter',sans-serif;white-space:nowrap}
+.ecat-Solstice{background:rgba(251,191,36,.15);color:#fbbf24}
+.ecat-Meteor{background:rgba(167,139,250,.15);color:#a78bfa}
+.ecat-Eclipse{background:rgba(239,68,68,.15);color:#ef4444}
+.ecat-Moon{background:rgba(129,140,248,.15);color:#818cf8}
+.ecat-Environmental{background:rgba(74,222,128,.15);color:#4ade80}
+.ecat-MilkyWay{background:rgba(56,189,248,.15);color:#38bdf8}
+.event-go-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;padding:2px 7px;white-space:nowrap;flex-shrink:0;transition:all .15s;margin-top:1px}
+.event-go-btn:hover{border-color:var(--accent);color:var(--accent)}
+#events-upcoming-toggle{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0}
+.ev-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:12px;font-size:10px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.ev-filter-btn.active{background:rgba(88,166,255,.12);border-color:var(--accent);color:var(--accent)}
+#events-cat-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px;flex-shrink:0}
 html.light .btn{background:var(--surface);border-color:var(--border);color:var(--text)}
 html.light .az-toggle-btn:not(.active){opacity:0.7;background:transparent!important}
 html.light #tz-toggle-btn,html.light #fmt-24h-btn{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)!important}
@@ -326,7 +358,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 #spots-panel-header h3{font-size:13px;font-weight:600;color:var(--text);margin:0}
 #spots-panel-body{display:flex;flex-direction:column;padding:10px 14px;overflow:hidden;flex:1;min-height:0}
 #spots-radius-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;flex-shrink:0}
-#spots-radius{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 7px;border-radius:5px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none}
+#spots-radius{cursor:pointer;height:4px;border:none;background:none}
 #spots-pin-prompt{display:none;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.25);border-radius:6px;padding:6px 10px;font-size:11px;color:#58a6ff;font-family:'Inter',sans-serif;margin-bottom:8px;flex-shrink:0}
 .spot-dist{font-size:10px;color:#58a6ff;font-family:'Inter',sans-serif;margin-left:auto;white-space:nowrap}
 
@@ -506,7 +538,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <div class="tb-group" style="gap:4px">
         <button class="btn" onclick="goToMyLocation()" title="Jump to my location">⌖ My Location</button>
         <div class="tb-dropdown" id="dd-search-wrap">
-          <button class="btn" onclick="toggleSearchDropdown()" title="Search">🔍 Search Location</button>
+          <button class="btn" onclick="toggleSearchDropdown()" title="Search">🔍 Search</button>
           <div id="dd-search-menu" class="tb-dropdown-menu" style="min-width:300px;padding:10px 12px">
             <div id="search-wrap" style="display:flex;gap:0;width:100%">
               <input id="search-input" type="text" placeholder="Search place or lat, lon…"
@@ -535,6 +567,8 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <div class="tb-group" style="gap:4px;align-items:center">
         <button class="btn" id="btnAzFinder" onclick="toggleAzFinder()">⊹ Azimuth Finder</button>
         <button class="btn" id="btnISS" onclick="toggleISS()">🛸 ISS</button>
+        <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
+        <button class="btn" id="btnEvents" onclick="toggleEventsPanel()" title="Celestial &amp; Seasonal Events">🔭 Events</button>
       </div>
 
       <!-- hidden MW btn for JS compat -->
@@ -550,8 +584,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
         <span class="tb-label" style="color:#58a6ff">Save</span>
         <button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
         <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
-        <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="Library">📂 Library</button>
-        <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
+        <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="My Library">📂 My Library</button>
       </div>
 
       <!-- THEME TOGGLE pushed to far right -->
@@ -601,7 +634,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <button class="btn" id="btnPinB-m" onclick="togglePin('b')">⊕ POI</button>
     </div>
     <div class="tb-row">
-      <button class="btn" onclick="toggleLibrary()">📂 Library</button>
+      <button class="btn" onclick="toggleLibrary()">📂 My Library</button>
       <button class="btn" onclick="toggleAzFinder()">⊹ Az Finder</button>
       <button class="btn" onclick="openSavePlan()">💾 Save Plan</button>
       <button class="btn" onclick="openSaveLocation()">⊛ Save Location</button>
@@ -681,21 +714,30 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       </div>
       <div id="spots-panel-body">
         <div id="spots-radius-row">
-          Within
-          <select id="spots-radius" onchange="renderSpotsPanel()">
-            <option value="25">25 mi</option>
-            <option value="50">50 mi</option>
-            <option value="100">100 mi</option>
-            <option value="250">250 mi</option>
-            <option value="0" selected>All</option>
-          </select>
-          of Observer
+          <span>Within</span>
+          <input type="range" id="spots-radius" min="0" max="500" step="5" value="0" oninput="updateSpotsRadiusLabel();renderSpotsPanel()" style="flex:1;min-width:0;accent-color:var(--accent)">
+          <span id="spots-radius-label" style="min-width:38px;text-align:right;color:var(--text);font-weight:500">All</span>
+          <span>of Observer</span>
         </div>
         <div id="spots-pin-prompt">Place an Observer pin to filter by distance</div>
         <input type="text" id="spots-search" placeholder="Search by name, state, or keyword…" oninput="renderSpotsPanel()" style="flex-shrink:0">
         <div id="spots-cat-row"></div>
         <div class="spot-count" id="spots-count"></div>
         <div id="spots-list"></div>
+      </div>
+    </div>
+
+    <!-- CELESTIAL & SEASONAL EVENTS PANEL -->
+    <div id="events-panel">
+      <div id="events-panel-header">
+        <h3>🔭 Celestial &amp; Seasonal Events</h3>
+        <button class="panel-close" onclick="toggleEventsPanel()">✕</button>
+      </div>
+      <div id="events-panel-body">
+        <div id="events-upcoming-toggle"></div>
+        <div id="events-cat-row"></div>
+        <div class="spot-count" id="events-count"></div>
+        <div id="events-list"></div>
       </div>
     </div>
 
@@ -1437,7 +1479,10 @@ function syncPinButtons() {
   if (sm) sm.style.display = show ? 'block' : 'none';
   if (show) updateInfoPanel();
   updateObserverInfoPanel();
-  if (document.getElementById('spots-panel')?.style.display === 'flex') renderSpotsPanel();
+  if (document.getElementById('spots-panel')?.style.display === 'flex') {
+    renderSpotsPanel();
+    buildDrivingCache();
+  }
   setTimeout(() => { drawAltGraph(); updatePanelPositions(); }, 50);
   const btnA = document.getElementById('btnPinA');
   const btnB = document.getElementById('btnPinB');
@@ -1538,8 +1583,12 @@ function placeMarker(which, lat, lng) {
       const newLat = e.target.getLatLng().lat, newLon = e.target.getLatLng().lng;
       dropPOIIfFar(newLat, newLon);
       latA = newLat; lonA = newLon;
-      yearCache = null; monthCache = null; updateInfoPanel(); updateObserverInfoPanel();
-      if (document.getElementById('spots-panel')?.style.display === 'flex') renderSpotsPanel();
+      yearCache = null; monthCache = null; _drivingFetchKey = ''; _drivingCache = null;
+      updateInfoPanel(); updateObserverInfoPanel();
+      if (document.getElementById('spots-panel')?.style.display === 'flex') {
+        renderSpotsPanel();
+        buildDrivingCache();
+      }
       saveState();
       tideFetchKey = '';
       if (timelineActive) { loadTideForCurrentState(); updateTimeDisplay(); }
@@ -1667,6 +1716,7 @@ function clearPin(which) {
     if (markerB) { map.removeLayer(markerB); markerB = null; }
     latA = lonA = latB = lonB = null;
     yearCache = null; monthCache = null; tideFetchKey = '';
+    _drivingCache = null; _drivingFetchKey = '';
 
     
     document.getElementById('canvas').getContext('2d').clearRect(0, 0, 9999, 9999);
@@ -2629,7 +2679,7 @@ function drawAltGraph() {
     const lines = [];
     if (showSun) {
       const sp = sunAltAz(jd, latA, lonA);
-      lines.push({ color: '#f59e0b', text: `☀️  ${sp.az.toFixed(1)}°  ${sp.alt > -0.833 ? '+'+sp.alt.toFixed(1)+'°' : sp.alt.toFixed(1)+'°'}` });
+      lines.push({ color: '#f59e0b', text: `🔭  ${sp.az.toFixed(1)}°  ${sp.alt > -0.833 ? '+'+sp.alt.toFixed(1)+'°' : sp.alt.toFixed(1)+'°'}` });
     }
     if (showMoon) {
       const mp = moonAltAz(jd, latA, lonA);
@@ -4611,7 +4661,7 @@ function openSavePlan() {
     plans.unshift(currentPlanSnapshot(name));
     savePlansStore(plans);
     renderPlansPanel();
-    flashBtn('btnLibrary', '📂 Library ✓');
+    flashBtn('btnLibrary', '📂 My Library ✓');
   });
 }
 
@@ -4676,7 +4726,7 @@ function loadPlan(plan) {
   saveState();
   redraw();
   togglePlansPanel();
-  flashBtn('btnLibrary', '📂 Library ✓');
+  flashBtn('btnLibrary', '📂 My Library ✓');
 }
 
 function renderPlansPanel() {
@@ -4763,7 +4813,7 @@ function openSaveLocation() {
     locs.unshift({ id: Date.now(), name, lat, lon, created: new Date().toISOString().slice(0,10) });
     saveLocationsStore(locs);
     renderLocationsPanel();
-    flashBtn('btnLibrary', '📂 Library ✓');
+    flashBtn('btnLibrary', '📂 My Library ✓');
   });
 }
 
@@ -4773,7 +4823,7 @@ function saveSpotAsLocation(s) {
   locs.unshift({ id: Date.now(), name: `${name}, ${state}`, lat, lon, created: new Date().toISOString().slice(0,10) });
   saveLocationsStore(locs);
   renderLocationsPanel();
-  flashBtn('btnLibrary', '📂 Library ✓');
+  flashBtn('btnLibrary', '📂 My Library ✓');
 }
 
 function deleteLocation(id) {
@@ -5184,6 +5234,13 @@ const SPOTS_DB = [
 
 const SPOTS_CATEGORIES = [...new Set(SPOTS_DB.map(s => s[4]))].sort();
 let activeSpotCat = null;
+let _drivingCache = null;   // { lat, lon, dists: Float32Array (km per SPOTS_DB index, -1 = unreachable) }
+let _drivingFetchKey = '';  // "lat,lon" — prevents duplicate fetches
+
+function updateSpotsRadiusLabel() {
+  const val = parseInt(document.getElementById('spots-radius')?.value || '0');
+  document.getElementById('spots-radius-label').textContent = val === 0 ? 'All' : `${val} mi`;
+}
 
 function toggleSpotsPanel() {
   const panel = document.getElementById('spots-panel');
@@ -5197,6 +5254,7 @@ function toggleSpotsPanel() {
     if (btn) btn.className = 'btn on';
     buildSpotsCatRow();
     renderSpotsPanel();
+    buildDrivingCache();
   }
 }
 
@@ -5214,22 +5272,64 @@ function setSpotCat(cat) {
   renderSpotsPanel();
 }
 
+async function buildDrivingCache() {
+  if (!latA) { _drivingCache = null; _drivingFetchKey = ''; return; }
+  const key = `${latA.toFixed(4)},${lonA.toFixed(4)}`;
+  if (_drivingFetchKey === key) return;
+  _drivingFetchKey = key;
+  _drivingCache = null;
+
+  // Observer coord first, then all spots (4 decimal places keeps URL short)
+  const coordStr = [`${lonA.toFixed(4)},${latA.toFixed(4)}`]
+    .concat(SPOTS_DB.map(s => `${s[3].toFixed(4)},${s[2].toFixed(4)}`))
+    .join(';');
+
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 12000);
+    const res = await fetch(
+      `https://router.project-osrm.org/table/v1/driving/${coordStr}?sources=0&annotations=distance`,
+      { signal: ctrl.signal }
+    );
+    const data = await res.json();
+    if (data.code !== 'Ok' || !data.distances?.[0]) return;
+
+    const dists = new Float32Array(SPOTS_DB.length).fill(-1);
+    data.distances[0].slice(1).forEach((d, i) => {
+      if (d != null) dists[i] = d / 1000; // metres → km
+    });
+
+    if (_drivingFetchKey === key) {
+      _drivingCache = { lat: latA, lon: lonA, dists };
+      if (document.getElementById('spots-panel')?.style.display === 'flex') renderSpotsPanel();
+    }
+  } catch { /* fall back to straight-line silently */ }
+}
+
 function renderSpotsPanel() {
   const radiusEl = document.getElementById('spots-radius');
   const promptEl = document.getElementById('spots-pin-prompt');
   const radiusMi = radiusEl ? parseInt(radiusEl.value) : 0;
   const useRadius = radiusMi > 0;
   const hasPin = latA !== null;
+  const hasDriving = hasPin && _drivingCache &&
+    Math.abs(_drivingCache.lat - latA) < 1e-4 &&
+    Math.abs(_drivingCache.lon - lonA) < 1e-4;
 
   // Show/hide the pin prompt
   if (promptEl) promptEl.style.display = (useRadius && !hasPin) ? 'block' : 'none';
 
   const query = (document.getElementById('spots-search')?.value || '').toLowerCase();
 
-  // Build list with distance when observer is set
-  let entries = SPOTS_DB.map(s => {
+  // Build list — prefer driving distance, fall back to straight-line
+  let entries = SPOTS_DB.map((s, i) => {
     const [name, state, lat, lon, cat, note] = s;
-    const km = hasPin ? distKm(latA, lonA, lat, lon) : null;
+    let km = null;
+    if (hasDriving && _drivingCache.dists[i] >= 0) {
+      km = _drivingCache.dists[i];
+    } else if (hasPin) {
+      km = distKm(latA, lonA, lat, lon);
+    }
     const mi = km !== null ? km * 0.621371 : null;
     return { s, name, state, lat, lon, cat, note, km, mi };
   });
@@ -5251,7 +5351,9 @@ function renderSpotsPanel() {
     entries.sort((a, b) => a.km - b.km);
   }
 
-  document.getElementById('spots-count').textContent = `${entries.length} location${entries.length!==1?'s':''}`;
+  document.getElementById('spots-count').textContent =
+    `${entries.length} location${entries.length!==1?'s':''}` +
+    (hasPin && !hasDriving ? ' · calculating drive times…' : '');
 
   const list = document.getElementById('spots-list');
   if (!entries.length) {
@@ -5259,9 +5361,12 @@ function renderSpotsPanel() {
     return;
   }
 
-  list.innerHTML = entries.map(({ s, name, state, lat, lon, cat, note, mi }) => {
+  list.innerHTML = entries.map(({ s, name, state, lat, lon, cat, note, km, mi }) => {
     const safeS = JSON.stringify(s).replace(/"/g,'&quot;');
-    const distHtml = mi !== null ? `<span class="spot-dist">${mi < 10 ? mi.toFixed(1) : Math.round(mi)} mi</span>` : '';
+    const distLabel = mi !== null
+      ? `${mi < 10 ? mi.toFixed(1) : Math.round(mi)} mi${hasDriving ? ' drive' : ''}`
+      : '';
+    const distHtml = distLabel ? `<span class="spot-dist">${distLabel}</span>` : '';
     return `<div class="spot-item">
       <div class="spot-name">${escHtml(name)}</div>
       <div class="spot-meta">
@@ -5290,6 +5395,155 @@ function loadSpot(s, which) {
   saveState(); redraw();
 }
 
+
+// ── CELESTIAL & SEASONAL EVENTS ───────────────────────────────────────────
+const CELESTIAL_EVENTS = [
+  // ── 2025 ──
+  { date:'2025-01-03', name:'Quadrantids Peak',          cat:'Meteor',      note:'Up to 120 meteors/hr. Radiant in Boötes. Best viewing before dawn.' },
+  { date:'2025-03-14', name:'Total Lunar Eclipse',       cat:'Eclipse',     note:'Visible from Americas, Europe, Africa. Moon turns deep red.' },
+  { date:'2025-03-20', name:'Spring Equinox',            cat:'Solstice',    note:'Sun rises/sets due East/West. Equal day and night.' },
+  { date:'2025-03-20', name:'Milky Way Season Opens',    cat:'MilkyWay',    note:'Galactic core becomes visible in the pre-dawn sky through October.' },
+  { date:'2025-03-21', name:'International Day of Forests', cat:'Environmental', note:'Celebrate and raise awareness of all types of forests.' },
+  { date:'2025-03-22', name:'World Water Day',           cat:'Environmental', note:'UN day focusing on freshwater and its conservation.' },
+  { date:'2025-03-29', name:'Partial Solar Eclipse',     cat:'Eclipse',     note:'Visible from NW Europe, N Africa, NE Americas.' },
+  { date:'2025-04-22', name:'Earth Day',                 cat:'Environmental', note:'Annual celebration of Earth\'s environment since 1970.' },
+  { date:'2025-04-22', name:'Lyrids Peak',               cat:'Meteor',      note:'~18 meteors/hr. Radiant near Vega. Best after midnight.' },
+  { date:'2025-05-06', name:'Eta Aquariids Peak',        cat:'Meteor',      note:'~50 meteors/hr. Halley\'s Comet debris. Best before dawn.' },
+  { date:'2025-06-05', name:'World Environment Day',     cat:'Environmental', note:'UN\'s principal vehicle for encouraging environmental action.' },
+  { date:'2025-06-20', name:'Summer Solstice',           cat:'Solstice',    note:'Longest day of the year. Sun at its northernmost rise/set points.' },
+  { date:'2025-08-12', name:'Perseids Peak',             cat:'Meteor',      note:'Up to 100 meteors/hr. Best annual shower. Best after midnight.' },
+  { date:'2025-09-07', name:'Total Lunar Eclipse',       cat:'Eclipse',     note:'Visible from Europe, Africa, Asia, Australia.' },
+  { date:'2025-09-21', name:'Partial Solar Eclipse',     cat:'Eclipse',     note:'Visible from S Pacific, New Zealand, Antarctica.' },
+  { date:'2025-09-22', name:'Fall Equinox',              cat:'Solstice',    note:'Sun rises/sets due East/West. Peak fall foliage season begins.' },
+  { date:'2025-10-07', name:'Supermoon \u2014 Hunter\'s Moon', cat:'Moon',        note:'Moon near perigee. Largest and brightest full moon of 2025.' },
+  { date:'2025-10-22', name:'Orionids Peak',             cat:'Meteor',      note:'~20 meteors/hr. Halley\'s Comet debris. Best after midnight.' },
+  { date:'2025-11-05', name:'Supermoon — Beaver Moon',   cat:'Moon',        note:'Second supermoon of autumn; ideal for moonlit landscape photography.' },
+  { date:'2025-11-17', name:'Leonids Peak',              cat:'Meteor',      note:'~15 meteors/hr. Fast, bright meteors. Best after midnight.' },
+  { date:'2025-12-14', name:'Geminids Peak',             cat:'Meteor',      note:'Up to 120 meteors/hr. Best annual shower. Active all night.' },
+  { date:'2025-12-21', name:'Winter Solstice',           cat:'Solstice',    note:'Shortest day of the year. Sun at its southernmost rise/set points.' },
+  { date:'2025-12-21', name:'Milky Way Season Closes',   cat:'MilkyWay',    note:'Galactic core sets with the sun; dark-sky window narrows until spring.' },
+  // ── 2026 ──
+  { date:'2026-01-03', name:'Quadrantids Peak',          cat:'Meteor',      note:'Up to 120 meteors/hr. Radiant in Boötes. Best viewing before dawn.' },
+  { date:'2026-02-17', name:'Annular Solar Eclipse',     cat:'Eclipse',     note:'Visible from S Atlantic and Antarctica. Ring-of-fire effect.' },
+  { date:'2026-03-20', name:'Spring Equinox',            cat:'Solstice',    note:'Sun rises/sets due East/West. Equal day and night.' },
+  { date:'2026-03-20', name:'Milky Way Season Opens',    cat:'MilkyWay',    note:'Galactic core becomes visible in the pre-dawn sky through October.' },
+  { date:'2026-03-21', name:'International Day of Forests', cat:'Environmental', note:'Celebrate and raise awareness of all types of forests.' },
+  { date:'2026-03-22', name:'World Water Day',           cat:'Environmental', note:'UN day focusing on freshwater and its conservation.' },
+  { date:'2026-04-22', name:'Earth Day',                 cat:'Environmental', note:'Annual celebration of Earth\'s environment since 1970.' },
+  { date:'2026-04-22', name:'Lyrids Peak',               cat:'Meteor',      note:'~18 meteors/hr. Radiant near Vega. Best after midnight.' },
+  { date:'2026-05-06', name:'Eta Aquariids Peak',        cat:'Meteor',      note:'~50 meteors/hr. Halley\'s Comet debris. Best before dawn.' },
+  { date:'2026-06-05', name:'World Environment Day',     cat:'Environmental', note:'UN\'s principal vehicle for encouraging environmental action.' },
+  { date:'2026-06-21', name:'Summer Solstice',           cat:'Solstice',    note:'Longest day of the year. Sun at its northernmost rise/set points.' },
+  { date:'2026-08-12', name:'Perseids Peak',             cat:'Meteor',      note:'Up to 100 meteors/hr. Best annual shower. Best after midnight.' },
+  { date:'2026-08-12', name:'Total Solar Eclipse',       cat:'Eclipse',     note:'Totality crosses Greenland, Iceland, Spain, NW Africa.' },
+  { date:'2026-09-11', name:'Partial Lunar Eclipse',     cat:'Eclipse',     note:'Visible from Europe, Africa, Americas, and W Asia.' },
+  { date:'2026-09-22', name:'Fall Equinox',              cat:'Solstice',    note:'Sun rises/sets due East/West. Peak fall foliage season begins.' },
+  { date:'2026-10-21', name:'Orionids Peak',             cat:'Meteor',      note:'~20 meteors/hr. Halley\'s Comet debris. Best after midnight.' },
+  { date:'2026-11-17', name:'Leonids Peak',              cat:'Meteor',      note:'~15 meteors/hr. Fast, bright meteors. Best after midnight.' },
+  { date:'2026-12-14', name:'Geminids Peak',             cat:'Meteor',      note:'Up to 120 meteors/hr. Best annual shower. Active all night.' },
+  { date:'2026-12-21', name:'Winter Solstice',           cat:'Solstice',    note:'Shortest day of the year. Sun at its southernmost rise/set points.' },
+  { date:'2026-12-21', name:'Milky Way Season Closes',   cat:'MilkyWay',    note:'Galactic core sets with the sun; dark-sky window narrows until spring.' },
+];
+
+const EVENTS_CATEGORIES = [...new Set(CELESTIAL_EVENTS.map(e => e.cat))];
+const EVENTS_CAT_LABELS = { Solstice:'Solstice/Equinox', Meteor:'Meteor Shower', Eclipse:'Eclipse', Moon:'Moon', Environmental:'Environmental', MilkyWay:'Milky Way' };
+let activeEventCat = null;
+let eventsUpcomingOnly = true;
+
+function toggleEventsPanel() {
+  const panel = document.getElementById('events-panel');
+  const btn = document.getElementById('btnEvents');
+  const visible = panel.style.display === 'flex';
+  if (visible) {
+    panel.style.display = 'none';
+    if (btn) btn.className = 'btn';
+  } else {
+    panel.style.display = 'flex';
+    if (btn) btn.className = 'btn on';
+    buildEventsCatRow();
+    buildEventsUpcomingToggle();
+    renderEventsPanel();
+  }
+}
+
+function buildEventsUpcomingToggle() {
+  const row = document.getElementById('events-upcoming-toggle');
+  if (!row) return;
+  row.innerHTML =
+    `<button class="ev-filter-btn${eventsUpcomingOnly?' active':''}" onclick="setEventsUpcoming(true)">Upcoming</button>` +
+    `<button class="ev-filter-btn${!eventsUpcomingOnly?' active':''}" onclick="setEventsUpcoming(false)">All</button>`;
+}
+
+function setEventsUpcoming(val) {
+  eventsUpcomingOnly = val;
+  buildEventsUpcomingToggle();
+  renderEventsPanel();
+}
+
+function buildEventsCatRow() {
+  const row = document.getElementById('events-cat-row');
+  if (!row) return;
+  row.innerHTML =
+    `<button class="ev-filter-btn${activeEventCat===null?' active':''}" onclick="setEventCat(null)">All</button>` +
+    EVENTS_CATEGORIES.map(c =>
+      `<button class="ev-filter-btn${activeEventCat===c?' active':''}" onclick="setEventCat('${c}')">${EVENTS_CAT_LABELS[c]||c}</button>`
+    ).join('');
+}
+
+function setEventCat(cat) {
+  activeEventCat = cat;
+  buildEventsCatRow();
+  renderEventsPanel();
+}
+
+function renderEventsPanel() {
+  const today = new Date().toISOString().slice(0, 10);
+  let events = CELESTIAL_EVENTS.filter(e => {
+    if (activeEventCat && e.cat !== activeEventCat) return false;
+    if (eventsUpcomingOnly && e.date < today) return false;
+    return true;
+  });
+  // Sort chronologically
+  events = events.slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+
+  const countEl = document.getElementById('events-count');
+  if (countEl) countEl.textContent = `${events.length} event${events.length!==1?'s':''}`;
+
+  const list = document.getElementById('events-list');
+  if (!list) return;
+  if (!events.length) {
+    list.innerHTML = '<div class="panel-empty">No events match your filter</div>';
+    return;
+  }
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  list.innerHTML = events.map(ev => {
+    const isPast = ev.date < today;
+    const [y, m, d] = ev.date.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m-1, d));
+    const label = `${DAYS[dt.getUTCDay()]}, ${MONTHS[m-1]} ${d}, ${y}`;
+    const catSlug = ev.cat.replace(/[^a-zA-Z]/g,'');
+    return `<div class="event-item${isPast?' past':''}">
+      <div class="event-date${!isPast?' upcoming':''}">${label}</div>
+      <div class="event-body">
+        <div class="event-name">
+          ${escHtml(ev.name)}
+          <span class="event-cat-badge ecat-${catSlug}" style="margin-left:5px">${EVENTS_CAT_LABELS[ev.cat]||ev.cat}</span>
+        </div>
+        <div class="event-note">${escHtml(ev.note)}</div>
+      </div>
+      <button class="event-go-btn" onclick="jumpToEvent('${ev.date}')" title="Go to this date">→</button>
+    </div>`;
+  }).join('');
+}
+
+function jumpToEvent(dateStr) {
+  document.getElementById('datePicker').value = dateStr;
+  document.getElementById('datePicker').dispatchEvent(new Event('change'));
+  setDateMode('day');
+}
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.addEventListener('load', initMap);
