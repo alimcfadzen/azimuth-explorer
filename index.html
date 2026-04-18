@@ -27,7 +27,8 @@ html.light body{background:var(--bg);color:var(--text)}
 html.light #map,html.light .leaflet-container{background:#d8dfe8}
 html.light input[type=date]{background:var(--bg3);border-color:var(--border);color:var(--text)}
 html.light #date-wrap{background:var(--surface)!important;border-color:var(--border)!important}
-html.light #date-wrap button{border-left-color:var(--border)!important}
+html.light #date-wrap button{border-left-color:var(--border)!important;color:var(--text)}
+html.light #btnDateMode{color:#0969da!important}
 html.light #datePicker{color-scheme:light}
 html.light .tb-row+.tb-row{border-top:1px solid rgba(208,215,222,.8)}
 /* Panel backgrounds */
@@ -35,7 +36,12 @@ html.light #az-panel,
 html.light #phase-panel,
 html.light #iss-panel,
 html.light #pin-mode-bar,
+html.light #observer-info-panel,
 html.light #tooltip{background:rgba(246,248,250,.97)!important}
+#observer-info-panel{display:none;background:rgba(22,27,34,.92);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11px;line-height:1.55;color:var(--text);min-width:160px;max-width:210px;pointer-events:none;margin-top:4px;backdrop-filter:blur(4px)}
+#observer-info-panel .oi-row{display:flex;justify-content:space-between;gap:8px}
+#observer-info-panel .oi-label{color:var(--muted);opacity:0.7;white-space:nowrap}
+#observer-info-panel .oi-val{text-align:right;font-variant-numeric:tabular-nums}
 html.light #library-panel{background:rgba(246,248,250,.99)!important}
 html.light .minimized-chip{background:rgba(246,248,250,.96)!important}
 html.light #time-info-block{background:rgba(246,248,250,.88)!important}
@@ -44,6 +50,8 @@ html.light #modal-input{background:var(--bg3);color:var(--text)}
 html.light .spot-item,html.light .panel-item{background:transparent}
 html.light .spots-cat-btn{background:var(--bg3)}
 html.light #spots-search{background:var(--bg3);color:var(--text)}
+html.light #spots-panel{background:rgba(246,248,250,.99)!important}
+html.light #spots-radius{background:var(--bg3);color:var(--text)}
 html.light .btn{background:var(--surface);border-color:var(--border);color:var(--text)}
 html.light .az-toggle-btn:not(.active){opacity:0.7;background:transparent!important}
 html.light #tz-toggle-btn,html.light #fmt-24h-btn{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)!important}
@@ -84,6 +92,7 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 .satellite-mode .leaflet-tile{filter:none}
 .leaflet-container{background:#0a0f1a}
 #canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:400}
+#canvas-hover{position:absolute;top:0;left:0;pointer-events:none;z-index:401}
 #map.placing-a,#map.placing-b{cursor:crosshair}
 
 /* Draggable marker cursor */
@@ -306,6 +315,20 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 .panel-empty{font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;padding:10px 0;text-align:center}
 .panel-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;flex-shrink:0}
 .panel-close:hover{color:var(--text)}
+#spots-panel{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  background:rgba(13,17,23,.96);border:1px solid var(--border);
+  border-radius:10px;z-index:600;width:480px;
+  max-height:calc(100% - 28px);display:none;flex-direction:column;
+  backdrop-filter:blur(12px);overflow:hidden;
+}
+#spots-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+#spots-panel-header h3{font-size:13px;font-weight:600;color:var(--text);margin:0}
+#spots-panel-body{display:flex;flex-direction:column;padding:10px 14px;overflow:hidden;flex:1;min-height:0}
+#spots-radius-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;flex-shrink:0}
+#spots-radius{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 7px;border-radius:5px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none}
+#spots-pin-prompt{display:none;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.25);border-radius:6px;padding:6px 10px;font-size:11px;color:#58a6ff;font-family:'Inter',sans-serif;margin-bottom:8px;flex-shrink:0}
+.spot-dist{font-size:10px;color:#58a6ff;font-family:'Inter',sans-serif;margin-left:auto;white-space:nowrap}
 
 /* MODAL OVERLAY */
 #modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:700;display:none;align-items:center;justify-content:center}
@@ -398,6 +421,11 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 
 #datePicker::-webkit-calendar-picker-indicator{display:none}
 #btnDateMode::-webkit-calendar-picker-indicator{display:none}
+#btnDatePrev,#btnDateNext{background:transparent;border:none;color:var(--text);padding:0 5px;font-size:15px;cursor:pointer;height:100%;opacity:0.55;line-height:1;flex-shrink:0}
+#btnDatePrev:hover,#btnDateNext:hover{opacity:1}
+#date-display-label{font-size:12px;font-weight:700;font-family:'Inter',sans-serif;color:var(--text);white-space:nowrap;cursor:pointer;min-width:82px;text-align:center;padding:0 2px;user-select:none}
+#ddDatePicker{flex:1;background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;color-scheme:dark;cursor:pointer;outline:none}
+html.light #ddDatePicker{background:var(--surface);border-color:var(--border);color:var(--text);color-scheme:light}
 .leaflet-top,.leaflet-bottom{z-index:500 !important}
 </style>
 </head>
@@ -418,14 +446,21 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
       <!-- DATE: input + dropdown for month/year/phase -->
       <div class="tb-group" style="gap:4px">
         <div id="date-wrap" style="display:flex;align-items:center;background:#21262d;border:1px solid #30363d;border-radius:5px;height:28px">
-          <span style="padding:0 4px 0 8px;font-size:14px;line-height:1;pointer-events:none">📅</span>
-          <input type="date" id="datePicker" onclick="this.showPicker&&this.showPicker()" style="background:transparent;border:none;color:var(--text);padding:3px 4px 3px 0;font-size:12px;font-family:'Inter',sans-serif;height:28px;outline:none;color-scheme:dark;width:100px;cursor:pointer">
-          <span id="date-mode-label" style="display:none;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);padding:3px 4px 3px 0;white-space:nowrap"></span>
-          <button id="btnDateMode" onclick="toggleDateDropdown()" title="More date options" style="padding:0 8px;font-size:14px;border:none;border-left:1px solid #30363d;border-radius:0 5px 5px 0;height:100%;background:transparent;color:#58a6ff;cursor:pointer;line-height:1;font-size:18px;font-weight:900;padding:0 10px">▾</button>
+          <button id="btnDatePrev" onclick="stepDate(-1)" title="Previous day">‹</button>
+          <span id="date-display-label" onclick="toggleDateDropdown()">—</span>
+          <button id="btnDateNext" onclick="stepDate(1)" title="Next day">›</button>
+          <button id="btnDateMode" onclick="toggleDateDropdown()" title="More date options" style="border:none;border-left:1px solid #30363d;border-radius:0 5px 5px 0;height:100%;background:transparent;color:#58a6ff;cursor:pointer;line-height:1;font-size:18px;font-weight:900;padding:0 10px">▾</button>
+          <input type="date" id="datePicker" style="display:none;position:absolute">
         </div>
         <!-- Dropdown panel — positioned absolutely, NOT clipped by overflow:hidden -->
         <div id="dd-date-wrap" style="position:relative">
           <div id="date-mode-panel" style="min-width:280px">
+            <!-- Day picker -->
+            <div style="display:flex;gap:6px;padding:8px 14px;align-items:center">
+              <input type="date" id="ddDatePicker" onchange="onDdDateChange()">
+              <button class="btn" onclick="jumpToToday()" style="white-space:nowrap">Today</button>
+            </div>
+            <hr>
             <!-- Phase mode -->
             <div class="dd-item dd-header">🌙 Moon Phase</div>
             <div style="padding:4px 14px 8px">
@@ -434,24 +469,24 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
               <button id="phase-jump-btn" onclick="jumpToPhaseDate()" style="background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:5px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;margin-top:6px;display:none">Jump to date</button>
             </div>
             <hr>
-            <!-- Month mode (disabled) -->
-            <div class="dd-item dd-header" style="opacity:0.4">Month View</div>
-            <div style="display:flex;gap:6px;padding:4px 14px 8px;opacity:0.4;pointer-events:none">
-              <select id="monthPicker" onchange="onMonthYearChange()" disabled style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;flex:1">
+            <!-- Month mode -->
+            <div class="dd-item dd-header">Month View</div>
+            <div style="display:flex;gap:6px;padding:4px 14px 8px">
+              <select id="monthPicker" onchange="onMonthYearChange()" style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;flex:1">
                 <option value="0">January</option><option value="1">February</option><option value="2">March</option>
                 <option value="3">April</option><option value="4">May</option><option value="5">June</option>
                 <option value="6">July</option><option value="7">August</option><option value="8">September</option>
                 <option value="9">October</option><option value="10">November</option><option value="11">December</option>
               </select>
-              <select id="monthYearPicker" onchange="onMonthYearChange()" disabled style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px"></select>
-              <button class="btn" id="ddBtnMonth" disabled style="opacity:0.4;cursor:not-allowed">Show</button>
+              <select id="monthYearPicker" onchange="onMonthYearChange()" style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px"></select>
+              <button class="btn" id="ddBtnMonth" onclick="setDateMode('month');document.getElementById('date-mode-panel').classList.remove('open')">Show</button>
             </div>
             <hr>
-            <!-- Year mode (disabled) -->
-            <div class="dd-item dd-header" style="opacity:0.4">Year View</div>
-            <div style="display:flex;gap:6px;padding:4px 14px 8px;opacity:0.4;pointer-events:none">
-              <select id="yearPicker" onchange="onYearChange()" disabled style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;flex:1"></select>
-              <button class="btn" id="ddBtnYear" disabled style="opacity:0.4;cursor:not-allowed">Show</button>
+            <!-- Year mode -->
+            <div class="dd-item dd-header">Year View</div>
+            <div style="display:flex;gap:6px;padding:4px 14px 8px">
+              <select id="yearPicker" onchange="onYearChange()" style="background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;flex:1"></select>
+              <button class="btn" id="ddBtnYear" onclick="setDateMode('year');document.getElementById('date-mode-panel').classList.remove('open')">Show</button>
             </div>
           </div>
         </div>
@@ -516,6 +551,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
         <button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
         <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
         <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="Library">📂 Library</button>
+        <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
       </div>
 
       <!-- THEME TOGGLE pushed to far right -->
@@ -580,6 +616,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
   <div id="map-container">
     <div id="map"></div>
     <canvas id="canvas"></canvas>
+    <canvas id="canvas-hover"></canvas>
     <div id="pin-mode-bar"></div>
 
     <div id="minimized-dock" class="minimized-dock"></div>
@@ -615,7 +652,6 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
         <div id="lib-tabs">
           <button class="lib-tab active" id="tab-locations" onclick="switchLibTab('locations')">📍 My Locations</button>
           <button class="lib-tab" id="tab-plans" onclick="switchLibTab('plans')">📋 My Plans</button>
-          <button class="lib-tab" id="tab-spots" onclick="switchLibTab('spots')">★ Notable Spots</button>
         </div>
         <button class="panel-minimize-btn" id="min-library" onclick="toggleMinimize('library')" title="Minimize">−</button>
         <button class="panel-close" onclick="toggleLibrary()">✕</button>
@@ -634,14 +670,33 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
         <div class="panel-list" id="plans-list"></div>
       </div>
 
-      <!-- NOTABLE SPOTS TAB -->
-      <div id="lib-spots" class="lib-pane" style="display:none">
-        <input type="text" id="spots-search" placeholder="Search by name, state, or keyword…" oninput="renderSpotsPanel()">
+      </div><!-- end body-library -->
+    </div>
+
+    <!-- NOTABLE SPOTS PANEL -->
+    <div id="spots-panel">
+      <div id="spots-panel-header">
+        <h3>★ Notable Spots</h3>
+        <button class="panel-close" onclick="toggleSpotsPanel()">✕</button>
+      </div>
+      <div id="spots-panel-body">
+        <div id="spots-radius-row">
+          Within
+          <select id="spots-radius" onchange="renderSpotsPanel()">
+            <option value="25">25 mi</option>
+            <option value="50">50 mi</option>
+            <option value="100">100 mi</option>
+            <option value="250">250 mi</option>
+            <option value="0" selected>All</option>
+          </select>
+          of Observer
+        </div>
+        <div id="spots-pin-prompt">Place an Observer pin to filter by distance</div>
+        <input type="text" id="spots-search" placeholder="Search by name, state, or keyword…" oninput="renderSpotsPanel()" style="flex-shrink:0">
         <div id="spots-cat-row"></div>
         <div class="spot-count" id="spots-count"></div>
         <div id="spots-list"></div>
       </div>
-      </div><!-- end body-library -->
     </div>
 
     <!-- MODAL OVERLAY (name input) -->
@@ -1091,13 +1146,25 @@ function initMap() {
       }
     });
     new SatControl().addTo(map);
+
+    const ObserverInfoControl = L.Control.extend({
+      options: { position: 'topleft' },
+      onAdd: function() {
+        const div = L.DomUtil.create('div', '');
+        div.id = 'observer-info-panel';
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        return div;
+      }
+    });
+    new ObserverInfoControl().addTo(map);
   }, 500);
 
   map.on('click', onMapClick);
   map.on('mousemove', onMapHover);
   map.on('mouseout', hideTooltip);
-  map.on('moveend', () => { saveState(); redraw(); });
-  map.on('zoomend', () => { yearCache=null; saveState(); redraw(); });
+  map.on('moveend', () => { saveState(); redraw(); hideTooltip(); });
+  map.on('zoomend', () => { yearCache=null; saveState(); redraw(); hideTooltip(); });
 
   resizeCanvas();
   updatePanelPositions();
@@ -1158,6 +1225,7 @@ function initMap() {
 
   // Restore saved state (pins, toggles, etc.)
   const viewInfo = applyState(savedState);
+  updateDateLabel();
   updateAzFinderLabel();
 
   // Always open timeline
@@ -1339,6 +1407,8 @@ function resizeCanvas() {
   const mc = document.getElementById('map-container');
   const cv = document.getElementById('canvas');
   cv.width = mc.offsetWidth; cv.height = mc.offsetHeight;
+  const ch = document.getElementById('canvas-hover');
+  if (ch) { ch.width = mc.offsetWidth; ch.height = mc.offsetHeight; }
 }
 
 // ── PINS ──────────────────────────────────────────────────────────────────
@@ -1366,6 +1436,8 @@ function syncPinButtons() {
   const show = latA !== null;
   if (sm) sm.style.display = show ? 'block' : 'none';
   if (show) updateInfoPanel();
+  updateObserverInfoPanel();
+  if (document.getElementById('spots-panel')?.style.display === 'flex') renderSpotsPanel();
   setTimeout(() => { drawAltGraph(); updatePanelPositions(); }, 50);
   const btnA = document.getElementById('btnPinA');
   const btnB = document.getElementById('btnPinB');
@@ -1466,7 +1538,9 @@ function placeMarker(which, lat, lng) {
       const newLat = e.target.getLatLng().lat, newLon = e.target.getLatLng().lng;
       dropPOIIfFar(newLat, newLon);
       latA = newLat; lonA = newLon;
-      yearCache = null; monthCache = null; updateInfoPanel(); saveState();
+      yearCache = null; monthCache = null; updateInfoPanel(); updateObserverInfoPanel();
+      if (document.getElementById('spots-panel')?.style.display === 'flex') renderSpotsPanel();
+      saveState();
       tideFetchKey = '';
       if (timelineActive) { loadTideForCurrentState(); updateTimeDisplay(); }
       redraw();
@@ -1505,6 +1579,20 @@ function onMapClick(e) {
     placeMarker(pinMode, e.latlng.lat, e.latlng.lng);
     cancelPinMode();
     saveState();
+    return;
+  }
+  // In month/year mode: click a fan line to jump to that date
+  const fanCache = yearMode ? yearCache : (dateMode === 'month' ? monthCache : null);
+  if (fanCache && latA) {
+    const p0 = map.latLngToContainerPoint([latA, lonA]);
+    const mousePixel = map.latLngToContainerPoint(e.latlng);
+    const match = findClosestFanLine(p0, mousePixel, fanCache);
+    if (match) {
+      const iso = match.date.toISOString().slice(0, 10);
+      document.getElementById('datePicker').value = iso;
+      setDateMode('day');
+      hideTooltip();
+    }
   }
 }
 
@@ -1597,6 +1685,7 @@ function clearPins() { clearPin('a'); }
 // ── CONTROLS ──────────────────────────────────────────────────────────────
 document.getElementById('datePicker').value = new Date().toISOString().slice(0,10);
 document.getElementById('datePicker').addEventListener('change', ()=>{
+  updateDateLabel();
   updateInfoPanel(); if(selectedPhase) findNextPhaseDate(); saveState();
   tideFetchKey = ''; // force reload for new date
   if (timelineActive) loadTideForCurrentState();
@@ -2121,10 +2210,10 @@ async function loadTideForCurrentState() {
   const isFile = location.protocol === 'file:';
   tideStation = station; tideFetching = true; readout.textContent = '';
 
-  // Sort candidates: non-subordinate stations first, then subordinate, all within 200km
+  // Sort candidates: non-subordinate stations first, then subordinate, all within 50 miles (80.5 km)
   const candidates = [...NOAA_STATIONS]
-    .map(([id,name,slat,slon]) => ({ id, name, lat:slat, lon:slon, distKm:Math.round(Math.sqrt((latA-slat)**2+(lonA-slon)**2)*111), distMi:Math.round(Math.sqrt((latA-slat)**2+(lonA-slon)**2)*69) }))
-    .filter(s => s.distKm <= 200)
+    .map(([id,name,slat,slon]) => { const km = distKm(latA,lonA,slat,slon); return { id, name, lat:slat, lon:slon, distKm:Math.round(km), distMi:Math.round(km*0.621371) }; })
+    .filter(s => s.distKm <= 80.5)
     .sort((a,b) => {
       const subA = SUBORDINATE_STATIONS.has(a.id) ? 1 : 0;
       const subB = SUBORDINATE_STATIONS.has(b.id) ? 1 : 0;
@@ -2836,10 +2925,7 @@ function setDateMode(mode) {
   // Show "Back to Day" button when not in day mode
   const backBtn = document.getElementById('ddBtnDay');
   if (backBtn) backBtn.style.display = mode !== 'day' ? '' : 'none';
-  // Hide datePicker in non-day modes, show label instead
-  const dpEl = document.getElementById('datePicker');
-  if (dpEl) dpEl.style.display = mode === 'day' ? '' : 'none';
-  updateDateModeLabel();
+  updateDateLabel();
   // Phase: rebuild grid and find next date
   if (mode === 'phase') {
     if (!document.querySelector('#phase-grid .phase-cell')) buildPhaseGrid();
@@ -2849,6 +2935,8 @@ function setDateMode(mode) {
   yearCache = null; monthCache = null;
   if (mode === 'year'  && latA) buildYearCache();
   if (mode === 'month' && latA) buildMonthCache();
+  // Crosshair cursor in fan modes, default otherwise
+  map.getContainer().style.cursor = (mode === 'month' || mode === 'year') ? 'crosshair' : '';
   // Disable ISS in month/year mode
   const issBtn = document.getElementById('btnISS');
   if (issBtn) {
@@ -2873,22 +2961,58 @@ function onMonthYearChange() {
   onDateChange();
 }
 
-function updateDateModeLabel() {
-  const lbl = document.getElementById('date-mode-label');
+const DATE_DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DATE_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function updateDateLabel() {
+  const lbl = document.getElementById('date-display-label');
   if (!lbl) return;
+  const fanMode = (dateMode === 'month' || dateMode === 'year');
+  // Show/hide nav arrows
+  const prev = document.getElementById('btnDatePrev');
+  const next = document.getElementById('btnDateNext');
+  if (prev) prev.style.display = fanMode ? 'none' : '';
+  if (next) next.style.display = fanMode ? 'none' : '';
   if (dateMode === 'month') {
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const m = parseInt(document.getElementById('monthPicker').value);
     const y = parseInt(document.getElementById('monthYearPicker').value);
-    lbl.textContent = 'Month: ' + (monthNames[m] || '') + ' ' + (y || '');
-    lbl.style.display = '';
+    lbl.textContent = (MNAMES[m] || '') + ' ' + (y || '');
   } else if (dateMode === 'year') {
     const y = parseInt(document.getElementById('yearPicker').value);
-    lbl.textContent = 'Year: ' + (y || '');
-    lbl.style.display = '';
+    lbl.textContent = 'Year ' + (y || '');
   } else {
-    lbl.style.display = 'none';
+    const d = getDate();
+    lbl.textContent = `${DATE_DAYS[d.getUTCDay()]} ${DATE_MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
   }
+  // Sync dropdown calendar input
+  const ddp = document.getElementById('ddDatePicker');
+  if (ddp) ddp.value = document.getElementById('datePicker').value || '';
+}
+
+function updateDateModeLabel() { updateDateLabel(); }
+
+function stepDate(n) {
+  const d = getDate();
+  d.setUTCDate(d.getUTCDate() + n);
+  document.getElementById('datePicker').value = d.toISOString().slice(0,10);
+  document.getElementById('datePicker').dispatchEvent(new Event('change'));
+}
+
+function jumpToToday() {
+  document.getElementById('datePicker').value = new Date().toISOString().slice(0,10);
+  setDateMode('day');
+  document.getElementById('date-mode-panel')?.classList.remove('open');
+  document.getElementById('datePicker').dispatchEvent(new Event('change'));
+}
+
+function onDdDateChange() {
+  const ddp = document.getElementById('ddDatePicker');
+  if (!ddp || !ddp.value) return;
+  document.getElementById('datePicker').value = ddp.value;
+  setDateMode('day');
+  document.getElementById('date-mode-panel')?.classList.remove('open');
+  document.getElementById('datePicker').dispatchEvent(new Event('change'));
 }
 
 function ensureDatePicker() {
@@ -3145,6 +3269,77 @@ function cardinal(b) { return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SS
 function angDiff(a,b) { let d=a-b; while(d>180)d-=360; while(d<-180)d+=360; return d; }
 
 // ── INFO PANEL ────────────────────────────────────────────────────────────
+let _oipLat = null, _oipLon = null, _oipElev = null, _oipDecl = null;
+
+function toDMS(deg, posLabel, negLabel) {
+  const sign = deg < 0 ? negLabel : posLabel;
+  const abs = Math.abs(deg);
+  const d = Math.floor(abs);
+  const mf = (abs - d) * 60;
+  const m = Math.floor(mf);
+  const s = Math.round((mf - m) * 60);
+  return `${d}° ${m}' ${s}" ${sign}`;
+}
+
+async function updateObserverInfoPanel() {
+  const panel = document.getElementById('observer-info-panel');
+  if (!panel) return;
+  if (!latA) { panel.style.display = 'none'; return; }
+
+  const lat = latA, lon = lonA;
+
+  function render() {
+    const rows = [
+      ['Lat', lat.toFixed(6) + '°'],
+      ['Lon', lon.toFixed(6) + '°'],
+      ['', toDMS(lat, 'N', 'S')],
+      ['', toDMS(lon, 'E', 'W')],
+    ];
+    if (_oipElev !== null) rows.push(['Elev', _oipElev >= 0 ? `${_oipElev} m` : `${_oipElev} m`]);
+    else rows.push(['Elev', '…']);
+    if (_oipDecl !== null) {
+      const sign = _oipDecl >= 0 ? '+' : '';
+      rows.push(['Mag decl', `${sign}${_oipDecl.toFixed(1)}°`]);
+    } else {
+      rows.push(['Mag decl', '…']);
+    }
+    panel.innerHTML = rows.map(([lbl, val]) =>
+      `<div class="oi-row"><span class="oi-label">${lbl}</span><span class="oi-val">${val}</span></div>`
+    ).join('');
+    panel.style.display = 'block';
+  }
+
+  render();
+
+  // Fetch elevation + declination only when location changes
+  if (_oipLat !== lat || _oipLon !== lon) {
+    _oipLat = lat; _oipLon = lon;
+    _oipElev = null; _oipDecl = null;
+    render();
+
+    try {
+      const elevRes = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat.toFixed(6)}&longitude=${lon.toFixed(6)}`);
+      const elevData = await elevRes.json();
+      if (elevData.elevation != null) {
+        _oipElev = Math.round(Array.isArray(elevData.elevation) ? elevData.elevation[0] : elevData.elevation);
+        if (_oipLat === lat && _oipLon === lon) render();
+      }
+    } catch(e) { _oipElev = null; }
+
+    try {
+      const today = new Date();
+      const yr = today.getUTCFullYear(), mo = today.getUTCMonth()+1, dy = today.getUTCDate();
+      const declRes = await fetch(`https://www.ngdc.noaa.gov/geomag-web/calculators/calculateDeclination?lat1=${lat.toFixed(4)}&lon1=${lon.toFixed(4)}&startYear=${yr}&startMonth=${mo}&startDay=${dy}&resultFormat=json`);
+      const declData = await declRes.json();
+      const val = declData?.result?.[0]?.declination;
+      if (val != null) {
+        _oipDecl = parseFloat(val);
+        if (_oipLat === lat && _oipLon === lon) render();
+      }
+    } catch(e) { _oipDecl = null; }
+  }
+}
+
 function updateInfoPanel() {
   if (!latA) return;
   updateAzPanel();
@@ -3274,7 +3469,7 @@ function buildMonthCache() {
   const month = parseInt(mp.value);
   const year  = parseInt(my.value);
   const key = `${year}-${month}`;
-  if (monthCacheKey === key && monthCacheLat === latA && monthCacheLon === lonA) return;
+  if (monthCache && monthCacheKey === key && monthCacheLat === latA && monthCacheLon === lonA) return;
   monthCache = [];
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   for (let d = 1; d <= daysInMonth; d++) {
@@ -3673,34 +3868,57 @@ function redraw() {
 function onMapHover(e) {
   const fanCache = yearMode ? yearCache : (dateMode === 'month' ? monthCache : null);
   if (!fanCache || !latA) return;
-  // Don't trigger tooltip when hovering very close to the observer pin
-  const obsPixel = map.latLngToContainerPoint([latA, lonA]);
+  const p0 = map.latLngToContainerPoint([latA, lonA]);
   const mousePixel = map.latLngToContainerPoint(e.latlng);
-  const dx = obsPixel.x - mousePixel.x, dy = obsPixel.y - mousePixel.y;
+  const dx = p0.x - mousePixel.x, dy = p0.y - mousePixel.y;
   if (Math.sqrt(dx*dx + dy*dy) < 40) { hideTooltip(); return; }
   const allHidden = hiddenEvents.sunRise && hiddenEvents.sunSet && hiddenEvents.moonRise && hiddenEvents.moonSet && hiddenEvents.mwRise && hiddenEvents.mwSet;
   if (allHidden) { hideTooltip(); return; }
-  const az=bearing(latA,lonA,e.latlng.lat,e.latlng.lng);
-  const match=findClosestYearEntry(az, fanCache);
-  if(match) showTooltip(e.originalEvent,match); else hideTooltip();
+  const match = findClosestFanLine(p0, mousePixel, fanCache);
+  if(match) { showTooltip(e.originalEvent,match); drawHoverLine(match.az, match.color); }
+  else hideTooltip();
 }
 
-function findClosestYearEntry(az, cache) {
+function drawHoverLine(az, color) {
+  const ch = document.getElementById('canvas-hover');
+  if (!ch || !latA) return;
+  const ctx = ch.getContext('2d');
+  ctx.clearRect(0, 0, ch.width, ch.height);
+  const end = azEndPoint(latA, lonA, az, 2500);
+  const p0 = map.latLngToContainerPoint([latA, lonA]);
+  const p1 = map.latLngToContainerPoint(end);
+  ctx.save();
+  ctx.globalAlpha = 0.9; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+  ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+  ctx.restore();
+}
+
+function findClosestFanLine(p0, mousePixel, cache) {
   const entries = cache || yearCache;
-  if(!entries)return null;
-  const tol=2.5; let best=null,bestDiff=tol;
-  const types=[];
-  if(!hiddenEvents.sunRise)  types.push({key:'sun', azKey:'riseAz',timeKey:'rise', color:'#f59e0b',label:'Sunrise'});
-  if(!hiddenEvents.sunSet)   types.push({key:'sun', azKey:'setAz', timeKey:'set',  color:'#f97316',label:'Sunset'});
-  if(!hiddenEvents.moonRise) types.push({key:'moon',azKey:'riseAz',timeKey:'rise', color:'#818cf8',label:'Moonrise'});
-  if(!hiddenEvents.moonSet)  types.push({key:'moon',azKey:'setAz', timeKey:'set',  color:'#a78bfa',label:'Moonset'});
-  if(!hiddenEvents.mwRise)   types.push({key:'mw',  azKey:'riseAz',timeKey:'rise', color:'#4ade80',label:'MW Rise'});
-  if(!hiddenEvents.mwSet)    types.push({key:'mw',  azKey:'setAz', timeKey:'set',  color:'#4ade80',label:'MW Set'});
-  for(const entry of entries) {
-    for(const t of types){
-      const eaz=entry[t.key][t.azKey]; if(eaz==null)continue;
-      const diff=Math.abs(angDiff(az,eaz));
-      if(diff<bestDiff){bestDiff=diff;best={date:entry.date,az:eaz,time:entry[t.key][t.timeKey],...t};}
+  if (!entries) return null;
+  const PIX_TOL = 12;
+  let best = null, bestDist = PIX_TOL;
+  const types = [];
+  if (!hiddenEvents.sunRise)  types.push({key:'sun', azKey:'riseAz',timeKey:'rise', color:'#f59e0b',label:'Sunrise'});
+  if (!hiddenEvents.sunSet)   types.push({key:'sun', azKey:'setAz', timeKey:'set',  color:'#f97316',label:'Sunset'});
+  if (!hiddenEvents.moonRise) types.push({key:'moon',azKey:'riseAz',timeKey:'rise', color:'#818cf8',label:'Moonrise'});
+  if (!hiddenEvents.moonSet)  types.push({key:'moon',azKey:'setAz', timeKey:'set',  color:'#a78bfa',label:'Moonset'});
+  if (!hiddenEvents.mwRise)   types.push({key:'mw',  azKey:'riseAz',timeKey:'rise', color:'#4ade80',label:'MW Rise'});
+  if (!hiddenEvents.mwSet)    types.push({key:'mw',  azKey:'setAz', timeKey:'set',  color:'#4ade80',label:'MW Set'});
+  const mx = mousePixel.x - p0.x, my = mousePixel.y - p0.y;
+  for (const entry of entries) {
+    for (const t of types) {
+      const eaz = entry[t.key][t.azKey]; if (eaz == null) continue;
+      const end = azEndPoint(latA, lonA, eaz, 2500);
+      const p1 = map.latLngToContainerPoint(end);
+      const lx = p1.x - p0.x, ly = p1.y - p0.y;
+      const len = Math.sqrt(lx*lx + ly*ly); if (len < 1) continue;
+      const proj = (mx*lx + my*ly) / (len*len);
+      if (proj < 0) continue; // cursor is behind pin
+      const dist = Math.abs(mx*ly - my*lx) / len;
+      if (dist < bestDist) { bestDist = dist; best = {date:entry.date, az:eaz, time:entry[t.key][t.timeKey], ...t}; }
     }
   }
   return best;
@@ -3716,7 +3934,11 @@ function showTooltip(mouseEvent,match) {
   if(x+220>mc.offsetWidth)x-=234; if(y<0)y+=64;
   tt.style.left=x+'px'; tt.style.top=y+'px';
 }
-function hideTooltip(){document.getElementById('tooltip').style.display='none';}
+function hideTooltip(){
+  document.getElementById('tooltip').style.display='none';
+  const ch=document.getElementById('canvas-hover');
+  if(ch){const ctx=ch.getContext('2d');ctx.clearRect(0,0,ch.width,ch.height);}
+}
 
 // ── AZIMUTH FINDER ────────────────────────────────────────────────────────
 // ── ELEVATION ─────────────────────────────────────────────────────────────
@@ -4513,13 +4735,12 @@ function toggleLibrary(openTab) {
 
 function switchLibTab(tab) {
   activeLibTab = tab;
-  ['locations','plans','spots'].forEach(t => {
+  ['locations','plans'].forEach(t => {
     document.getElementById(`tab-${t}`).className = 'lib-tab' + (t===tab?' active':'');
     document.getElementById(`lib-${t}`).style.display = t===tab ? 'flex' : 'none';
   });
   if (tab === 'locations') renderLocationsPanel();
   if (tab === 'plans')     renderPlansPanel();
-  if (tab === 'spots')     { buildSpotsCatRow(); renderSpotsPanel(); }
 }
 
 function togglePlansPanel() { toggleLibrary('plans'); }
@@ -4544,6 +4765,15 @@ function openSaveLocation() {
     renderLocationsPanel();
     flashBtn('btnLibrary', '📂 Library ✓');
   });
+}
+
+function saveSpotAsLocation(s) {
+  const [name, state, lat, lon] = s;
+  const locs = loadLocations();
+  locs.unshift({ id: Date.now(), name: `${name}, ${state}`, lat, lon, created: new Date().toISOString().slice(0,10) });
+  saveLocationsStore(locs);
+  renderLocationsPanel();
+  flashBtn('btnLibrary', '📂 Library ✓');
 }
 
 function deleteLocation(id) {
@@ -4955,7 +5185,20 @@ const SPOTS_DB = [
 const SPOTS_CATEGORIES = [...new Set(SPOTS_DB.map(s => s[4]))].sort();
 let activeSpotCat = null;
 
-function toggleSpotsPanel() { toggleLibrary('spots'); }
+function toggleSpotsPanel() {
+  const panel = document.getElementById('spots-panel');
+  const btn = document.getElementById('btnSpots');
+  const visible = panel.style.display === 'flex';
+  if (visible) {
+    panel.style.display = 'none';
+    if (btn) btn.className = 'btn';
+  } else {
+    panel.style.display = 'flex';
+    if (btn) btn.className = 'btn on';
+    buildSpotsCatRow();
+    renderSpotsPanel();
+  }
+}
 
 function buildSpotsCatRow() {
   const row = document.getElementById('spots-cat-row');
@@ -4972,29 +5215,59 @@ function setSpotCat(cat) {
 }
 
 function renderSpotsPanel() {
+  const radiusEl = document.getElementById('spots-radius');
+  const promptEl = document.getElementById('spots-pin-prompt');
+  const radiusMi = radiusEl ? parseInt(radiusEl.value) : 0;
+  const useRadius = radiusMi > 0;
+  const hasPin = latA !== null;
+
+  // Show/hide the pin prompt
+  if (promptEl) promptEl.style.display = (useRadius && !hasPin) ? 'block' : 'none';
+
   const query = (document.getElementById('spots-search')?.value || '').toLowerCase();
-  const filtered = SPOTS_DB.filter(s => {
-    const catMatch = activeSpotCat === null || s[4] === activeSpotCat;
-    const textMatch = !query || s[0].toLowerCase().includes(query) || s[1].toLowerCase().includes(query) || s[5].toLowerCase().includes(query);
+
+  // Build list with distance when observer is set
+  let entries = SPOTS_DB.map(s => {
+    const [name, state, lat, lon, cat, note] = s;
+    const km = hasPin ? distKm(latA, lonA, lat, lon) : null;
+    const mi = km !== null ? km * 0.621371 : null;
+    return { s, name, state, lat, lon, cat, note, km, mi };
+  });
+
+  // Filter by category + text
+  entries = entries.filter(e => {
+    const catMatch = activeSpotCat === null || e.cat === activeSpotCat;
+    const textMatch = !query || e.name.toLowerCase().includes(query) || e.state.toLowerCase().includes(query) || e.note.toLowerCase().includes(query);
     return catMatch && textMatch;
   });
 
-  document.getElementById('spots-count').textContent = `${filtered.length} location${filtered.length!==1?'s':''}`;
+  // Filter by radius if observer set
+  if (useRadius && hasPin) {
+    entries = entries.filter(e => e.mi <= radiusMi);
+  }
+
+  // Sort by distance when observer is placed, otherwise alphabetical
+  if (hasPin) {
+    entries.sort((a, b) => a.km - b.km);
+  }
+
+  document.getElementById('spots-count').textContent = `${entries.length} location${entries.length!==1?'s':''}`;
 
   const list = document.getElementById('spots-list');
-  if (!filtered.length) {
+  if (!entries.length) {
     list.innerHTML = '<div class="panel-empty">No locations match your search</div>';
     return;
   }
 
-  list.innerHTML = filtered.map(s => {
-    const [name, state, lat, lon, cat, note] = s;
+  list.innerHTML = entries.map(({ s, name, state, lat, lon, cat, note, mi }) => {
     const safeS = JSON.stringify(s).replace(/"/g,'&quot;');
+    const distHtml = mi !== null ? `<span class="spot-dist">${mi < 10 ? mi.toFixed(1) : Math.round(mi)} mi</span>` : '';
     return `<div class="spot-item">
       <div class="spot-name">${escHtml(name)}</div>
       <div class="spot-meta">
         <span class="spot-state">${escHtml(state)}</span>
         <span class="spot-cat-badge cat-${escHtml(cat)}">${escHtml(cat)}</span>
+        ${distHtml}
       </div>
       <div class="spot-state" style="font-size:10px;color:var(--muted);margin-bottom:5px">${escHtml(note)}</div>
       <div class="spot-actions">
