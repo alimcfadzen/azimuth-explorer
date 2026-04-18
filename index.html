@@ -205,9 +205,10 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 #phase-jump-btn:hover{background:#a78bfa}
 
 /* TOOLTIP */
-#tooltip{position:absolute;background:rgba(13,17,23,.95);border:1px solid var(--border);border-radius:8px;padding:7px 11px;z-index:600;font-size:12px;pointer-events:none;display:none;backdrop-filter:blur(8px);max-width:220px}
+#tooltip{position:absolute;background:rgba(13,17,23,.95);border:1px solid var(--border);border-radius:8px;padding:7px 11px;z-index:600;font-size:12px;pointer-events:none;display:none;backdrop-filter:blur(8px);max-width:260px}
 #tooltip .tt-date{font-weight:600;color:var(--text);font-family:'Inter',sans-serif;margin-bottom:2px}
 #tooltip .tt-info{color:var(--muted);font-size:11px}
+#tooltip .tt-mw-extra{color:var(--muted);font-size:10px;margin-top:3px;opacity:.85}
 
 /* AZ FINDER */
 #az-panel{position:absolute;right:14px;background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:10px;padding:12px 14px;z-index:500;width:218px;backdrop-filter:blur(10px);display:none}
@@ -462,7 +463,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 #btnDateMode::-webkit-calendar-picker-indicator{display:none}
 #btnDatePrev,#btnDateNext{background:transparent;border:none;color:var(--text);padding:0 5px;font-size:15px;cursor:pointer;height:100%;opacity:0.55;line-height:1;flex-shrink:0}
 #btnDatePrev:hover,#btnDateNext:hover{opacity:1}
-#date-display-label{font-size:12px;font-weight:700;font-family:'Inter',sans-serif;color:var(--text);white-space:nowrap;cursor:pointer;min-width:82px;text-align:center;padding:0 2px;user-select:none}
+#date-display-label{font-size:14px;font-weight:700;font-family:'Inter',sans-serif;color:var(--text);white-space:nowrap;cursor:pointer;min-width:100px;text-align:center;padding:0 4px;user-select:none}
 #ddDatePicker{flex:1;background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;color-scheme:dark;cursor:pointer;outline:none}
 html.light #ddDatePicker{background:var(--surface);border-color:var(--border);color:var(--text);color-scheme:light}
 .leaflet-top,.leaflet-bottom{z-index:500 !important}
@@ -587,7 +588,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <button style="display:none" id="btnPhase" onclick="setDateMode('phase');toggleDateDropdown()"></button>
 
       <!-- SAVE BUTTONS -->
-      <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="My Library">📂 My Library</button>
+      <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="My Library">📂 Library</button>
       <div class="tb-group" style="gap:4px">
 <button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
         <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
@@ -640,7 +641,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <button class="btn" id="btnPinB-m" onclick="togglePin('b')">⊕ POI</button>
     </div>
     <div class="tb-row">
-      <button class="btn" onclick="toggleLibrary()">📂 My Library</button>
+      <button class="btn" onclick="toggleLibrary()">📂 Library</button>
       <button class="btn" onclick="toggleAzFinder()">⊹ Az Finder</button>
       <button class="btn" onclick="openSavePlan()">💾 Save Plan</button>
       <button class="btn" onclick="openSaveLocation()">⊛ Save Location</button>
@@ -1092,7 +1093,7 @@ function saveState() {
       use24h,
       lightMode: document.documentElement.classList.contains('light'),
       hiddenEvents: {...hiddenEvents},
-      openPanels: getOpenPanels().filter(p => p !== 'library'),
+      openPanels: getOpenPanels().filter(p => p !== 'library' && p !== 'azfinder'),
     };
     localStorage.setItem(STORE_KEY, JSON.stringify(s));
   } catch(e) {}
@@ -1124,7 +1125,7 @@ function applyState(s) {
   // Toggle states
   showSun  = s.showSun  !== undefined ? s.showSun  : true;
   showMoon = s.showMoon !== undefined ? s.showMoon : true;
-  showMW   = true; // always show MW
+  showMW   = s.showMW   !== undefined ? s.showMW   : true;
   showRise = s.showRise !== undefined ? s.showRise : true;
   showSet  = s.showSet  !== undefined ? s.showSet  : true;
   yearMode = s.yearMode || false;
@@ -1792,9 +1793,19 @@ document.getElementById('datePicker').addEventListener('change', ()=>{
 });
 
 function toggle(body) {
-  if (body==='sun')  { showSun=!showSun;   document.getElementById('btnSun').className='btn'+(showSun?' sun-on':''); }
-  if (body==='moon') { showMoon=!showMoon; document.getElementById('btnMoon').className='btn'+(showMoon?' moon-on':''); }
-  if (body==='mw')   { showMW=!showMW;     document.getElementById('btnMW').className='btn'+(showMW?' mw-on':''); }
+  if (body==='sun') {
+    showSun = !showSun;
+    hiddenEvents.sunRise = hiddenEvents.sunSet = !showSun;
+    ['btnSun','btnSun-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showSun?' sun-on':''); });
+  } else if (body==='moon') {
+    showMoon = !showMoon;
+    hiddenEvents.moonRise = hiddenEvents.moonSet = !showMoon;
+    ['btnMoon','btnMoon-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showMoon?' moon-on':''); });
+  } else if (body==='mw') {
+    showMW = !showMW;
+    hiddenEvents.mwRise = hiddenEvents.mwSet = !showMW;
+    ['btnMW','btnMW-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showMW?' mw-on':''); });
+  }
   updateInfoPanel(); saveState(); redraw();
 }
 
@@ -3192,7 +3203,7 @@ function syncMobileButtons() {
   ];
   pairs.forEach(([d,m]) => {
     const de = document.getElementById(d), me = document.getElementById(m);
-    if (de && me) { me.className = de.className; me.innerHTML = de.innerHTML; }
+    if (de && me) { me.className = de.className; if (de.innerHTML.trim()) me.innerHTML = de.innerHTML; }
   });
   // Sync date
   const dp = document.getElementById('datePicker'), dpm = document.getElementById('datePicker-m');
@@ -3615,6 +3626,12 @@ function toggleISS() {
   // Disable in month/year mode
   if (dateMode === 'month' || dateMode === 'year') return;
 
+  if (minimizedState['iss']) {
+    minimizedState['iss'] = false;
+    renderMinimizedDock();
+    return;
+  }
+
   const panel = document.getElementById('iss-panel');
   const isOpen = panel.classList.contains('open');
 
@@ -3638,6 +3655,7 @@ function closeISSPanel() {
   document.getElementById('btnISS').className = 'btn';
   document.getElementById('iss-panel').classList.remove('open');
   saveState();
+  renderMinimizedDock();
 }
 
 function renderISSPanel(state) {
@@ -3896,7 +3914,6 @@ function redraw() {
       if (_mw && !hiddenEvents.mwSet    && _mw.setAz  != null) azLines.push({az:_mw.setAz,  color:'#14b8a6', label:'MW Set'});
       for (const ln of azLines) {
         drawLine(ctx,latA,lonA,ln.az,ln.color,0.75,2,2500,null);
-        drawLabel(ctx,latA,lonA,ln.az,ln.color,ln.label+' '+ln.az.toFixed(0)+'°',160);
       }
     }
   }
@@ -3929,16 +3946,6 @@ function redraw() {
       // Colored opaque line
       ctx.globalAlpha = 1; ctx.strokeStyle = ln.color; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
-      // Label offset perpendicular to line
-      const frac = Math.min(1, 220 / Math.sqrt((p1.x-p0.x)**2 + (p1.y-p0.y)**2) || 1);
-      const lx = p0.x + (p1.x-p0.x)*frac, ly = p0.y + (p1.y-p0.y)*frac;
-      const ldx=p1.x-p0.x, ldy=p1.y-p0.y, llen=Math.sqrt(ldx*ldx+ldy*ldy)||1;
-      let lnx=-ldy/llen, lny=ldx/llen;
-      if(lny>0){lnx=-lnx;lny=-lny;}
-      const tx=lx+lnx*14, ty=ly+lny*14;
-      ctx.globalAlpha = 1; ctx.fillStyle = ln.color;
-      ctx.font = 'bold 11px "Inter",sans-serif';
-      ctx.fillText(`${ln.label} ${ln.az.toFixed(1)}°`, tx, ty);
       ctx.restore();
     }
   }
@@ -4017,10 +4024,30 @@ function findClosestFanLine(p0, mousePixel, cache) {
   return best;
 }
 
+function mwDayInfo(dateObj) {
+  if (!latA) return null;
+  const peakAlt = Math.asin(
+    Math.sin(latA*Math.PI/180)*Math.sin(MW_DEC) +
+    Math.cos(latA*Math.PI/180)*Math.cos(MW_DEC)
+  ) * 180/Math.PI;
+  const midnight = new Date(Date.UTC(dateObj.getUTCFullYear(), dateObj.getUTCMonth(), dateObj.getUTCDate()));
+  const n = toJD(midnight) - 2451545;
+  const gmst0 = ((280.46061837 + 360.98564736629*n) % 360 + 360) % 360;
+  const delta = ((MW_RA - lonA - gmst0) % 360 + 360) % 360;
+  const tHrs = delta / (360.98564736629/24);
+  const transitDate = new Date(midnight.getTime() + tHrs*3600000);
+  return { peakAlt, transitDate };
+}
+
 function showTooltip(mouseEvent,match) {
   const tt=document.getElementById('tooltip');
   document.getElementById('tt-date').textContent=match.date.toUTCString().slice(0,16);
-  document.getElementById('tt-info').innerHTML=`<span style="color:${match.color}">${match.label}</span> · <span style="font-family:'Inter',sans-serif">${match.az.toFixed(1)}°</span> · ${match.time?fmtTime(match.time):'—'}`;
+  let info=`<span style="color:${match.color}">${match.label}</span> · <span style="font-family:'Inter',sans-serif">${match.az.toFixed(1)}°</span> · ${match.time?fmtTime(match.time):'—'}`;
+  if (match.key==='mw') {
+    const mw=mwDayInfo(match.date);
+    if (mw) info+=`<div class="tt-mw-extra">✦ Galactic Core · Peak alt: ${mw.peakAlt.toFixed(1)}° · Transit: ${fmtTime(mw.transitDate)}</div>`;
+  }
+  document.getElementById('tt-info').innerHTML=info;
   tt.style.display='block';
   const mc=document.getElementById('map-container'),rect=mc.getBoundingClientRect();
   let x=mouseEvent.clientX-rect.left+14,y=mouseEvent.clientY-rect.top-54;
@@ -4601,14 +4628,14 @@ function updateRiseSetStrip() {
 
 const RISE_SET_PAIRS = { sunRise:'sunSet', sunSet:'sunRise', moonRise:'moonSet', moonSet:'moonRise', mwRise:'mwSet', mwSet:'mwRise' };
 function toggleStripEvent(key) {
-  const wasHidden = hiddenEvents[key];
-  if (key in hiddenEvents) hiddenEvents[key] = !hiddenEvents[key];
-  // Turning ON → also enable the paired rise/set if it's currently off
-  if (wasHidden) {
-    const pair = RISE_SET_PAIRS[key];
-    if (pair && hiddenEvents[pair]) hiddenEvents[pair] = false;
-  }
+  const body = key.startsWith('sun') ? 'sun' : key.startsWith('moon') ? 'moon' : 'mw';
+  const newHidden = !hiddenEvents[key];
+  hiddenEvents[body + 'Rise'] = hiddenEvents[body + 'Set'] = newHidden;
+  if (body==='sun')  { showSun  = !newHidden; ['btnSun','btnSun-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showSun?' sun-on':''); }); }
+  if (body==='moon') { showMoon = !newHidden; ['btnMoon','btnMoon-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showMoon?' moon-on':''); }); }
+  if (body==='mw')   { showMW   = !newHidden; ['btnMW','btnMW-m'].forEach(id=>{ const b=document.getElementById(id); if(b) b.className='btn'+(showMW?' mw-on':''); }); }
   updateInfoPanel();
+  saveState();
   redraw();
 }
 
@@ -4761,7 +4788,7 @@ function openSavePlan() {
     plans.unshift(currentPlanSnapshot(name));
     savePlansStore(plans);
     renderPlansPanel();
-    flashBtn('btnLibrary', '📂 My Library ✓');
+    flashBtn('btnLibrary', '📂 Library ✓');
   });
 }
 
@@ -4826,7 +4853,7 @@ function loadPlan(plan) {
   saveState();
   redraw();
   togglePlansPanel();
-  flashBtn('btnLibrary', '📂 My Library ✓');
+  flashBtn('btnLibrary', '📂 Library ✓');
 }
 
 function renderPlansPanel() {
@@ -4876,6 +4903,8 @@ function toggleLibrary(openTab) {
   if (visible && !openTab) {
     panel.style.display = 'none';
     btn.className = 'btn';
+    minimizedState['library'] = false;
+    renderMinimizedDock();
   } else {
     const spotsP = document.getElementById('spots-panel');
     if (spotsP && spotsP.style.display === 'flex') toggleSpotsPanel();
@@ -4917,7 +4946,7 @@ function openSaveLocation() {
     locs.unshift({ id: Date.now(), name, lat, lon, created: new Date().toISOString().slice(0,10) });
     saveLocationsStore(locs);
     renderLocationsPanel();
-    flashBtn('btnLibrary', '📂 My Library ✓');
+    flashBtn('btnLibrary', '📂 Library ✓');
   });
 }
 
@@ -4927,7 +4956,7 @@ function saveSpotAsLocation(s) {
   locs.unshift({ id: Date.now(), name: `${name}, ${state}`, lat, lon, created: new Date().toISOString().slice(0,10) });
   saveLocationsStore(locs);
   renderLocationsPanel();
-  flashBtn('btnLibrary', '📂 My Library ✓');
+  flashBtn('btnLibrary', '📂 Library ✓');
 }
 
 function deleteLocation(id) {
@@ -5350,12 +5379,14 @@ function toggleSpotsPanel() {
   const panel = document.getElementById('spots-panel');
   const btn = document.getElementById('btnSpots');
   const visible = panel.style.display === 'flex';
-  if (visible) {
+  if (visible || minimizedState['spots']) {
     panel.style.display = 'none';
     if (btn) btn.className = 'btn';
     minimizedState['spots'] = false;
+    renderMinimizedDock();
   } else {
     minimizedState['spots'] = false;
+    renderMinimizedDock();
     const lib = document.getElementById('library-panel');
     if (lib && lib.style.display === 'flex') toggleLibrary();
     panel.style.display = 'flex';
@@ -5562,12 +5593,14 @@ function toggleEventsPanel() {
   const panel = document.getElementById('events-panel');
   const btn = document.getElementById('btnEvents');
   const visible = panel.style.display === 'flex';
-  if (visible) {
+  if (visible || minimizedState['events']) {
     panel.style.display = 'none';
     if (btn) btn.className = 'btn';
     minimizedState['events'] = false;
+    renderMinimizedDock();
   } else {
     minimizedState['events'] = false;
+    renderMinimizedDock();
     const lib = document.getElementById('library-panel');
     if (lib && lib.style.display === 'flex') toggleLibrary();
     panel.style.display = 'flex';
@@ -5675,6 +5708,7 @@ function jumpToEvent(dateStr) {
   document.getElementById('datePicker').value = dateStr;
   document.getElementById('datePicker').dispatchEvent(new Event('change'));
   setDateMode('day');
+  updateTimeDisplay();
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
