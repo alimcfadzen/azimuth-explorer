@@ -80,6 +80,7 @@ html.light #events-panel{background:rgba(246,248,250,.99)!important}
 .ecat-Moon{background:rgba(129,140,248,.15);color:#818cf8}
 .ecat-Environmental{background:rgba(74,222,128,.15);color:#4ade80}
 .ecat-MilkyWay{background:rgba(56,189,248,.15);color:#38bdf8}
+.ecat-Planet{background:rgba(251,146,60,.15);color:#fb923c}
 .event-go-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;padding:2px 7px;white-space:nowrap;flex-shrink:0;transition:all .15s;margin-top:1px}
 .event-go-btn:hover{border-color:var(--accent);color:var(--accent)}
 #events-upcoming-toggle{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0}
@@ -761,7 +762,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
     </div>
 
     <!-- MODAL OVERLAY (name input) -->
-    <div id="modal-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:700;align-items:center;justify-content:center">
+    <div id="modal-overlay" onclick="if(event.target===this)closeModal()" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:700;align-items:center;justify-content:center">
       <div id="modal-box">
         <h3 id="modal-title">Save Plan</h3>
         <input type="text" id="modal-input" placeholder="Enter a name…" maxlength="60">
@@ -1249,6 +1250,7 @@ function initMap() {
       }
     });
     new ObserverInfoControl().addTo(map);
+    updateObserverInfoPanel();
   }, 500);
 
   map.on('click', onMapClick);
@@ -1655,11 +1657,11 @@ function placeMarker(which, lat, lng) {
       icon: makeIcon('#22d3ee'), draggable: true, title: 'POI (drag to move)'
     }).addTo(map);
     markerB.on('drag', e => {
-      latB = e.latlng.lat; lonB = e.latlng.lng; redraw();
+      latB = e.latlng.lat; lonB = e.latlng.lng; updateObserverInfoPanel(); redraw();
     });
     markerB.on('dragend', e => {
       latB = e.target.getLatLng().lat; lonB = e.target.getLatLng().lng;
-      updateInfoPanel(); saveState(); redraw();
+      updateInfoPanel(); updateObserverInfoPanel(); saveState(); redraw();
     });
   }
   if (latA !== null) {
@@ -1673,6 +1675,7 @@ function placeMarker(which, lat, lng) {
   }
   syncPinButtons();
   updateInfoPanel();
+  updateObserverInfoPanel();
   setTimeout(updatePanelPositions, 60); redraw();
 }
 
@@ -3378,6 +3381,49 @@ function angDiff(a,b) { let d=a-b; while(d>180)d-=360; while(d<-180)d+=360; retu
 
 // ── INFO PANEL ────────────────────────────────────────────────────────────
 let _oipLat = null, _oipLon = null, _oipElev = null, _oipDecl = null;
+let _oipLatB = null, _oipLonB = null, _oipElevB = null;
+
+function computeMagDeclination(latDeg, lonDeg) {
+  // WMM2020 Gauss coefficients + secular variation to degree 5
+  // [n, m, gnm, hnm, gnm_sv, hnm_sv] in nT; epoch 2020.0
+  const WMM = [
+    [1,0,-29404.5,0,6.7,0],[1,1,-1450.7,4652.9,7.7,-25.1],
+    [2,0,-2500.0,0,-11.5,0],[2,1,2982.0,-2991.6,-7.1,-30.2],[2,2,1676.6,-734.8,2.2,-23.9],
+    [3,0,1363.9,0,2.8,0],[3,1,-2381.0,-82.2,-6.2,5.7],[3,2,1236.2,241.8,3.4,-1.0],[3,3,525.7,-542.9,-12.2,1.1],
+    [4,0,903.1,0,-1.1,0],[4,1,809.4,282.0,4.7,0.4],[4,2,86.2,-158.4,-6.5,6.3],[4,3,-309.4,199.8,5.8,3.6],[4,4,47.9,-350.1,-5.6,-5.0],
+    [5,0,-234.4,0,-0.3,0],[5,1,363.1,47.7,0.0,0.1],[5,2,187.8,208.4,-0.6,2.5],[5,3,-140.7,-121.3,0.1,-0.9],[5,4,-151.2,32.9,1.2,3.0],[5,5,13.7,99.1,1.0,0.5],
+  ];
+  const now = new Date();
+  const dt = now.getUTCFullYear() + (now.getUTCMonth() + 0.5) / 12 - 2020.0;
+  const th = (90 - latDeg) * Math.PI / 180;
+  const ph = lonDeg * Math.PI / 180;
+  const ct = Math.cos(th), st = Math.sin(th);
+  // Schmidt quasi-normal associated Legendre functions P and dP/dtheta
+  const P = Array.from({length:7}, () => new Float64Array(7));
+  const dP = Array.from({length:7}, () => new Float64Array(7));
+  P[0][0] = 1;
+  P[1][0] = ct;  dP[1][0] = -st;
+  P[1][1] = st;  dP[1][1] =  ct;
+  for (let n = 2; n <= 5; n++) {
+    for (let m = 0; m < n; m++) {
+      const f1 = (2*n-1) / Math.sqrt((n-m)*(n+m));
+      const f2 = m < n-1 ? Math.sqrt(((n-1-m)*(n-1+m)) / ((n-m)*(n+m))) : 0;
+      P[n][m]  = f1*ct*P[n-1][m]  - f2*P[n-2][m];
+      dP[n][m] = f1*(ct*dP[n-1][m] - st*P[n-1][m]) - f2*dP[n-2][m];
+    }
+    const fn = Math.sqrt(1 - 1/(2*n));
+    P[n][n]  = fn*(st*P[n-1][n-1]);
+    dP[n][n] = fn*(st*dP[n-1][n-1] + ct*P[n-1][n-1]);
+  }
+  let Bn = 0, Be = 0;
+  for (const [n, m, g0, h0, gd, hd] of WMM) {
+    const g = g0 + gd*dt, h = h0 + hd*dt;
+    const cm = Math.cos(m*ph), sm = Math.sin(m*ph);
+    Bn += (g*cm + h*sm) * dP[n][m];
+    if (st > 1e-5) Be += m * (g*sm - h*cm) * P[n][m] / st;
+  }
+  return Math.atan2(Be, Bn) * 180 / Math.PI;
+}
 
 function toDMS(deg, posLabel, negLabel) {
   const sign = deg < 0 ? negLabel : posLabel;
@@ -3411,9 +3457,28 @@ async function updateObserverInfoPanel() {
     } else {
       rows.push(['Mag decl', '…']);
     }
-    panel.innerHTML = rows.map(([lbl, val]) =>
+    let html = `<div style="color:var(--pin-a);font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">● OBSERVER</div>`;
+    html += rows.map(([lbl, val]) =>
       `<div class="oi-row"><span class="oi-label">${lbl}</span><span class="oi-val">${val}</span></div>`
     ).join('');
+    if (latB !== null) {
+      const bng = bearing(lat, lon, latB, lonB);
+      const dist = distKm(lat, lon, latB, lonB);
+      const poiRows = [
+        ['Lat', latB.toFixed(6) + '°'],
+        ['Lon', lonB.toFixed(6) + '°'],
+        ['', toDMS(latB, 'N', 'S')],
+        ['', toDMS(lonB, 'E', 'W')],
+        ['Elev', _oipElevB !== null ? `${_oipElevB} m` : '…'],
+        ['Bearing', bng.toFixed(1) + '° ' + cardinal(bng)],
+        ['Distance', dist >= 1 ? dist.toFixed(2) + ' km' : (dist * 1000).toFixed(0) + ' m'],
+      ];
+      html += `<div style="border-top:1px solid var(--border);margin:5px 0 4px;padding-top:4px;color:var(--pin-b);font-size:10px;font-weight:600;letter-spacing:.04em">● POI</div>`;
+      html += poiRows.map(([lbl, val]) =>
+        `<div class="oi-row"><span class="oi-label">${lbl}</span><span class="oi-val">${val}</span></div>`
+      ).join('');
+    }
+    panel.innerHTML = html;
     panel.style.display = 'block';
   }
 
@@ -3434,18 +3499,25 @@ async function updateObserverInfoPanel() {
       }
     } catch(e) { _oipElev = null; }
 
-    try {
-      const today = new Date();
-      const yr = today.getUTCFullYear(), mo = today.getUTCMonth()+1, dy = today.getUTCDate();
-      const declRes = await fetch(`https://www.ngdc.noaa.gov/geomag-web/calculators/calculateDeclination?lat1=${lat.toFixed(4)}&lon1=${lon.toFixed(4)}&startYear=${yr}&startMonth=${mo}&startDay=${dy}&resultFormat=json`);
-      const declData = await declRes.json();
-      const val = declData?.result?.[0]?.declination;
-      if (val != null) {
-        _oipDecl = parseFloat(val);
-        if (_oipLat === lat && _oipLon === lon) render();
-      }
-    } catch(e) { _oipDecl = null; }
+    _oipDecl = computeMagDeclination(lat, lon);
+    if (_oipLat === lat && _oipLon === lon) render();
   }
+
+  // Fetch POI elevation when POI location changes
+  if (latB !== null && (_oipLatB !== latB || _oipLonB !== lonB)) {
+    _oipLatB = latB; _oipLonB = lonB;
+    _oipElevB = null;
+    render();
+    try {
+      const elevRes = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${latB.toFixed(6)}&longitude=${lonB.toFixed(6)}`);
+      const elevData = await elevRes.json();
+      if (elevData.elevation != null) {
+        _oipElevB = Math.round(Array.isArray(elevData.elevation) ? elevData.elevation[0] : elevData.elevation);
+        if (_oipLatB === latB && _oipLonB === lonB) render();
+      }
+    } catch(e) { _oipElevB = null; }
+  }
+  if (latB === null) { _oipLatB = null; _oipLonB = null; _oipElevB = null; }
 }
 
 function updateInfoPanel() {
@@ -4936,18 +5008,15 @@ function togglePlansPanel() { toggleLibrary('plans'); }
 function openSaveLocation() {
   const hasA = latA !== null, hasB = latB !== null;
   if (!hasA && !hasB) { alert('Place an Observer or POI pin first.'); return; }
-  const showChoice = hasA && hasB;
-  const sub = showChoice
-    ? 'Choose which pin to save as a location:'
-    : hasA ? `Observer: ${latA.toFixed(4)}°, ${lonA.toFixed(4)}°`
-           : `POI: ${latB.toFixed(4)}°, ${lonB.toFixed(4)}°`;
-  if (!showChoice) modalPinChoice = hasA ? 'a' : 'b';
-  showModal('Save Location', sub, 'Location name…', showChoice, 'Save', (name, pin) => {
-    const which = pin || (hasA ? 'a' : 'b');
-    const lat = which === 'a' ? latA : latB;
-    const lon = which === 'a' ? lonA : lonB;
+  const parts = [];
+  if (hasA) parts.push(`Observer: ${latA.toFixed(4)}°, ${lonA.toFixed(4)}°`);
+  if (hasB) parts.push(`POI: ${latB.toFixed(4)}°, ${lonB.toFixed(4)}°`);
+  showModal('Save Location', parts.join('  ·  '), 'Location name…', false, 'Save', (name) => {
+    const loc = { id: Date.now(), name, created: new Date().toISOString().slice(0,10) };
+    if (hasA) { loc.lat = latA; loc.lon = lonA; }
+    if (hasB) { loc.latB = latB; loc.lonB = lonB; }
     const locs = loadLocations();
-    locs.unshift({ id: Date.now(), name, lat, lon, created: new Date().toISOString().slice(0,10) });
+    locs.unshift(loc);
     saveLocationsStore(locs);
     renderLocationsPanel();
     flashBtn('btnLibrary', '📂 Library ✓');
@@ -4979,6 +5048,17 @@ function loadLocationAsPin(loc, which) {
   saveState(); redraw();
 }
 
+function loadLocation(loc) {
+  if (loc.lat != null) placeMarker('a', loc.lat, loc.lon);
+  if (loc.latB != null) placeMarker('b', loc.latB, loc.lonB);
+  if (loc.lat != null) flyToVisible(loc.lat, loc.lon, Math.max(map.getZoom(), 15));
+  syncPinButtons();
+  updateInfoPanel();
+  setTimeout(updatePanelPositions, 60);
+  if (loc.lat != null) { tideFetchKey=''; redrawTideCanvas(); if(timelineActive) loadTideForCurrentState(); }
+  saveState(); redraw();
+}
+
 function renderLocationsPanel() {
   const locs = loadLocations();
   const list = document.getElementById('locations-list');
@@ -4986,17 +5066,23 @@ function renderLocationsPanel() {
     list.innerHTML = '<div class="panel-empty">No saved locations yet</div>';
     return;
   }
-  list.innerHTML = locs.map(l => `
-    <div class="panel-item" onclick="loadLocationAsPin(${JSON.stringify(l).replace(/"/g,'&quot;')}, 'a')">
+  list.innerHTML = locs.map(l => {
+    const lj = JSON.stringify(l).replace(/"/g,'&quot;');
+    const metaA = l.lat  != null ? `<div class="panel-item-meta">▲ ${l.lat.toFixed(4)}°, ${l.lon.toFixed(4)}°</div>` : '';
+    const metaB = l.latB != null ? `<div class="panel-item-meta">● ${l.latB.toFixed(4)}°, ${l.lonB.toFixed(4)}°</div>` : '';
+    return `
+    <div class="panel-item" onclick="loadLocation(${lj})">
       <div>
         <div class="panel-item-name">${escHtml(l.name)}</div>
-        <div class="panel-item-meta">${l.lat.toFixed(4)}°, ${l.lon.toFixed(4)}°</div>
+        ${metaA}${metaB}
       </div>
       <div class="panel-item-actions" onclick="event.stopPropagation()">
-        <button class="panel-icon-btn" style="font-size:9px;width:auto;padding:0 6px" title="Load as POI" onclick="loadLocationAsPin(${JSON.stringify(l).replace(/"/g,'&quot;')}, 'b')">POI</button>
+        <button class="panel-icon-btn" style="font-size:9px;width:auto;padding:0 6px;color:var(--pin-a)" title="Load as Observer" onclick="loadLocationAsPin(${lj}, 'a')">▲ Obs</button>
+        <button class="panel-icon-btn" style="font-size:9px;width:auto;padding:0 6px;color:var(--pin-b)" title="Load as POI" onclick="loadLocationAsPin(${lj}, 'b')">● POI</button>
         <button class="panel-icon-btn del" title="Delete location" onclick="deleteLocation(${l.id})">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleLocationsPanel() { toggleLibrary('locations'); }
@@ -5539,6 +5625,173 @@ function loadSpot(s, which) {
 }
 
 
+// ── PLANETARY MECHANICS ───────────────────────────────────────────────────
+// Keplerian orbital elements [a,e,i,L,Lp,Om,da,de,di,dL,dLp,dOm] per Julian century
+// Source: JPL Approximate Positions of the Major Planets (Table 1, J2000.0)
+const KEPLER_EL = {
+  Mercury:[ 0.38709927,0.20563593, 7.00497902,252.25032350, 77.45779628, 48.33076593, 0.00000037, 0.00001906,-0.00594749,149472.67411175, 0.16047689,-0.12534081],
+  Venus:  [ 0.72333566,0.00677672, 3.39467605,181.97909950,131.60246718, 76.67984255, 0.00000390,-0.00004107,-0.00078890, 58517.81538729, 0.00268329,-0.27769418],
+  Earth:  [ 1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,  0.00000000, 0.00000562,-0.00004392,-0.01294668, 35999.37244981, 0.32327364,  0.00000000],
+  Mars:   [ 1.52371034,0.09339410, 1.84969142, -4.55343205,-23.94362959, 49.55953891, 0.00001847, 0.00007882,-0.00813131, 19140.30268499, 0.44441088,-0.29257343],
+  Jupiter:[ 5.20288700,0.04838624, 1.30439695, 34.39644051, 14.72847983,100.47390909,-0.00011607,-0.00013253,-0.00183714,  3034.74612775, 0.21252668,  0.20469106],
+  Saturn: [ 9.53667594,0.05386179, 2.48599187, 49.95424423, 92.59887831,113.66242448,-0.00125060,-0.00050991,  0.00193609,  1222.49362201,-0.41897216,-0.28867794],
+};
+const PLANET_DIAM_KM = {Mercury:4879,Venus:12104,Mars:6779,Jupiter:142984,Saturn:120536};
+const AU_KM = 149597870.7;
+
+function _keplerHelio(name, T) {
+  const el = KEPLER_EL[name];
+  const a  = el[0]+el[6]*T, e=el[1]+el[7]*T;
+  const i  = (el[2]+el[8]*T)*Math.PI/180;
+  const Lp = (el[4]+el[10]*T)*Math.PI/180;
+  const Om = (el[5]+el[11]*T)*Math.PI/180;
+  const L  = ((el[3]+el[9]*T)%360+360)%360*Math.PI/180;
+  let M = ((L-Lp)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  let E = M;
+  for(let k=0;k<8;k++) E=M+e*Math.sin(E);
+  const xO=a*(Math.cos(E)-e), yO=a*Math.sqrt(1-e*e)*Math.sin(E);
+  const w=Lp-Om, cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(Om),sO=Math.sin(Om),ci=Math.cos(i),si=Math.sin(i);
+  const x=(cw*cO-sw*sO*ci)*xO+(-sw*cO-cw*sO*ci)*yO;
+  const y=(cw*sO+sw*cO*ci)*xO+(-sw*sO+cw*cO*ci)*yO;
+  const z=(sw*si)*xO+(cw*si)*yO;
+  return {x,y,z,r:Math.sqrt(x*x+y*y+z*z)};
+}
+
+function planetGeocentric(name, jd) {
+  const T=(jd-2451545)/36525;
+  const p=_keplerHelio(name,T), e=_keplerHelio('Earth',T);
+  const gx=p.x-e.x, gy=p.y-e.y, gz=p.z-e.z;
+  const dist=Math.sqrt(gx*gx+gy*gy+gz*gz);
+  const eps=23.43929111*Math.PI/180;
+  const ra =(Math.atan2(gy*Math.cos(eps)-gz*Math.sin(eps),gx)*180/Math.PI+360)%360;
+  const dec=Math.asin((gy*Math.sin(eps)+gz*Math.cos(eps))/dist);
+  const dot=(-e.x*gx-e.y*gy-e.z*gz)/(e.r*dist);
+  const elongation=Math.acos(Math.max(-1,Math.min(1,dot)))*180/Math.PI;
+  const geocLon=(Math.atan2(gy,gx)*180/Math.PI+360)%360;
+  const sunLon =(Math.atan2(-e.y,-e.x)*180/Math.PI+360)%360;
+  const isEast =((geocLon-sunLon+360)%360)<180;
+  return {ra,dec,dist,elongation,isEast,helDist:p.r};
+}
+
+function planetAltAzFromGeocentric(name, jd, lat, lon) {
+  const {ra,dec,dist,elongation,isEast,helDist}=planetGeocentric(name,jd);
+  const n=jd-2451545;
+  const GMST=(280.46061837+360.98564736629*n+360)%360;
+  const LST=((GMST+lon)%360+360)%360;
+  const HA=(LST-ra+360)%360;
+  const haR=HA*Math.PI/180, latR=lat*Math.PI/180;
+  const alt=Math.asin(Math.sin(latR)*Math.sin(dec)+Math.cos(latR)*Math.cos(dec)*Math.cos(haR))*180/Math.PI;
+  const az=(Math.atan2(-Math.cos(dec)*Math.sin(haR),Math.sin(dec)*Math.cos(latR)-Math.cos(dec)*Math.cos(haR)*Math.sin(latR))*180/Math.PI+360)%360;
+  return {alt,az,dist,elongation,isEast,helDist};
+}
+
+function planetRiseSetTransit(name, dateStr, lat, lon) {
+  const [y,m,d]=dateStr.split('-').map(Number);
+  const base=Date.UTC(y,m-1,d);
+  const step=30;
+  const samples=[];
+  for(let min=0;min<=24*60;min+=step){
+    const t=new Date(base+min*60000);
+    const {alt,az}=planetAltAzFromGeocentric(name,toJD(t),lat,lon);
+    samples.push({t,alt,az});
+  }
+  let rise=null,riseAz=null,set=null,setAz=null,transitAlt=-999,transitTime=null;
+  for(let i=1;i<samples.length;i++){
+    const p=samples[i-1],c=samples[i];
+    if(p.alt<0&&c.alt>=0&&!rise){const f=-p.alt/(c.alt-p.alt);rise=new Date(p.t.getTime()+f*step*60000);riseAz=p.az+f*(c.az-p.az);}
+    if(p.alt>=0&&c.alt<0&&!set){const f=-p.alt/(c.alt-p.alt);set=new Date(p.t.getTime()+f*step*60000);setAz=p.az+f*(c.az-p.az);}
+    if(c.alt>transitAlt){transitAlt=c.alt;transitTime=c.t;}
+  }
+  return {rise,riseAz,set,setAz,transitAlt,transitTime};
+}
+
+let _planetEventsCache=null, _planetEventsCacheYear=null;
+
+function getPlanetEvents() {
+  const yr=new Date().getFullYear();
+  if(_planetEventsCache&&_planetEventsCacheYear===yr) return _planetEventsCache;
+  _planetEventsCacheYear=yr;
+  _planetEventsCache=_computePlanetEvents();
+  return _planetEventsCache;
+}
+
+function _computePlanetEvents() {
+  const evts=[];
+  const today=new Date();
+  const startJD=toJD(new Date(Date.UTC(today.getUTCFullYear()-1,0,1)));
+  const endJD  =toJD(new Date(Date.UTC(today.getUTCFullYear()+2,0,1)));
+  const nDays  =Math.floor(endJD-startJD);
+
+  // Outer planets — scan every 3 days for opposition and conjunction
+  for(const planet of ['Mars','Jupiter','Saturn']){
+    const data=[];
+    for(let i=0;i<=nDays;i+=3){
+      const jd=startJD+i;
+      const {elongation,dist}=planetGeocentric(planet,jd);
+      data.push({jd,elong:elongation,dist});
+    }
+    for(let i=1;i<data.length-1;i++){
+      const [p,c,n]=[data[i-1],data[i],data[i+1]];
+      if(c.elong>p.elong&&c.elong>n.elong&&c.elong>155){
+        const d=new Date((c.jd-2440587.5)*86400000);
+        evts.push({cat:'Planet',type:'opposition',planet,date:d.toISOString().slice(0,10),jd:c.jd,name:`${planet} at Opposition`,dist:c.dist});
+      }
+      if(c.elong<p.elong&&c.elong<n.elong&&c.elong<8){
+        const d=new Date((c.jd-2440587.5)*86400000);
+        evts.push({cat:'Planet',type:'conjunction',planet,date:d.toISOString().slice(0,10),jd:c.jd,name:`${planet} at Solar Conjunction`,dist:c.dist});
+      }
+    }
+  }
+
+  // Inner planets — scan every day for greatest elongation
+  for(const planet of ['Mercury','Venus']){
+    const data=[];
+    for(let i=0;i<=nDays;i++){
+      const jd=startJD+i;
+      const {elongation,isEast}=planetGeocentric(planet,jd);
+      data.push({jd,elong:elongation,isEast});
+    }
+    for(let i=1;i<data.length-1;i++){
+      const [p,c,n]=[data[i-1],data[i],data[i+1]];
+      if(c.elong>p.elong&&c.elong>n.elong&&c.elong>10){
+        const d=new Date((c.jd-2440587.5)*86400000);
+        const dir=c.isEast?'Eastern':'Western';
+        const {dist}=planetGeocentric(planet,c.jd);
+        evts.push({cat:'Planet',type:'elongation',planet,date:d.toISOString().slice(0,10),jd:c.jd,name:`${planet}: Greatest ${dir} Elongation`,elongation:c.elong,dist});
+      }
+    }
+  }
+
+  return evts;
+}
+
+function buildPlanetEventNote(ev) {
+  const parts=[];
+  if(ev.type==='opposition'){
+    parts.push('At opposition — rises near sunset, visible all night.');
+  } else if(ev.type==='elongation'){
+    const dir=ev.name.includes('Eastern')?'Eastern':'Western';
+    const sky=dir==='Eastern'?'evening sky after sunset':'morning sky before sunrise';
+    parts.push(`Greatest ${dir} Elongation (${ev.elongation.toFixed(1)}°) — ${sky}.`);
+  } else if(ev.type==='conjunction'){
+    parts.push('At solar conjunction — near the Sun, not easily visible.');
+  }
+  if(ev.dist){
+    const angDiam=(PLANET_DIAM_KM[ev.planet]/(AU_KM*ev.dist)*206265).toFixed(1);
+    parts.push(`${ev.dist.toFixed(2)} AU · Ø ${angDiam}"`);
+  }
+  if(latA!==null&&ev.type!=='conjunction'){
+    const rst=planetRiseSetTransit(ev.planet,ev.date,latA,lonA);
+    const rp=[];
+    if(rst.rise) rp.push(`↑ ${fmtTime(rst.rise)} Az ${rst.riseAz.toFixed(0)}°`);
+    if(rst.transitTime&&rst.transitAlt>0) rp.push(`⊤ ${fmtTime(rst.transitTime)} ${rst.transitAlt.toFixed(0)}°`);
+    if(rst.set) rp.push(`↓ ${fmtTime(rst.set)} Az ${rst.setAz.toFixed(0)}°`);
+    if(rp.length) parts.push(rp.join('  ·  '));
+    else if(!rst.rise&&!rst.set&&rst.transitAlt<0) parts.push('Below horizon at this location.');
+  }
+  return parts.map(p=>escHtml(p)).join('<br>');
+}
+
 // ── CELESTIAL & SEASONAL EVENTS ───────────────────────────────────────────
 const CELESTIAL_EVENTS = [
   // ── 2025 ──
@@ -5588,8 +5841,8 @@ const CELESTIAL_EVENTS = [
   { date:'2026-12-21', name:'Milky Way Season Closes',   cat:'MilkyWay',    note:'Galactic core sets with the sun; dark-sky window narrows until spring.' },
 ];
 
-const EVENTS_CATEGORIES = [...new Set(CELESTIAL_EVENTS.map(e => e.cat))];
-const EVENTS_CAT_LABELS = { Solstice:'Solstice/Equinox', Meteor:'Meteor Shower', Eclipse:'Eclipse', Moon:'Moon', Environmental:'Environmental', MilkyWay:'Milky Way' };
+const EVENTS_CATEGORIES = [...new Set(CELESTIAL_EVENTS.map(e => e.cat)), 'Planet'];
+const EVENTS_CAT_LABELS = { Solstice:'Solstice/Equinox', Meteor:'Meteor Shower', Eclipse:'Eclipse', Moon:'Moon', Environmental:'Environmental', MilkyWay:'Milky Way', Planet:'Planets' };
 let activeEventCat = null;
 let eventsUpcomingOnly = true;
 
@@ -5666,7 +5919,7 @@ function renderEventsPanel() {
     cutoff.setMonth(cutoff.getMonth() + monthsAhead);
     cutoffStr = cutoff.toISOString().slice(0, 10);
   }
-  let events = CELESTIAL_EVENTS.filter(e => {
+  let events = [...CELESTIAL_EVENTS, ...getPlanetEvents()].filter(e => {
     if (activeEventCat && e.cat !== activeEventCat) return false;
     if (eventsUpcomingOnly && e.date < today) return false;
     if (cutoffStr && e.date > cutoffStr) return false;
@@ -5694,6 +5947,7 @@ function renderEventsPanel() {
     const dt = new Date(Date.UTC(y, m-1, d));
     const label = `${DAYS[dt.getUTCDay()]}, ${MONTHS[m-1]} ${d}, ${y}`;
     const catSlug = ev.cat.replace(/[^a-zA-Z]/g,'');
+    const noteHtml = ev.cat === 'Planet' ? buildPlanetEventNote(ev) : escHtml(ev.note||'');
     return `<div class="event-item${isPast?' past':''}">
       <div class="event-date${!isPast?' upcoming':''}">${label}</div>
       <div class="event-body">
@@ -5701,7 +5955,7 @@ function renderEventsPanel() {
           ${escHtml(ev.name)}
           <span class="event-cat-badge ecat-${catSlug}" style="margin-left:5px">${EVENTS_CAT_LABELS[ev.cat]||ev.cat}</span>
         </div>
-        <div class="event-note">${escHtml(ev.note)}</div>
+        <div class="event-note">${noteHtml}</div>
       </div>
       <button class="event-go-btn" onclick="jumpToEvent('${ev.date}')" title="Go to this date">→</button>
     </div>`;
