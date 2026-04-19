@@ -5860,6 +5860,22 @@ function getMoonPhaseEvents() {
   return _moonPhaseCache;
 }
 
+const LUNAR_EFFECTS = [
+  {angle:20,  name:'Lunar L',                              win:1.5,
+   desc:'An L-shaped chiaroscuro formed by crater rim shadows in the southern lunar highlands. Timing is approximate.'},
+  {angle:50,  name:'Lunar V',                              win:1.5,
+   desc:'A V-shaped chiaroscuro visible along the terminator, formed by crater rims near the Straight Wall region.'},
+  {angle:70,  name:'Lunar X \u2014 Purbach\'s Cross',      win:1,
+   desc:'The iconic X-shape where craters Purbach, Regiomontanus, and Blanchinus meet the terminator. One of the most photographed lunar effects.'},
+  {angle:98,  name:'Straight Wall (Rupes Recta)',          win:2,
+   desc:'A 110 km fault scarp in Mare Nubium appears as a stark dark line. Best seen with binoculars or telescope.'},
+  {angle:125, name:'Jeweled Handle \u2014 Sinus Iridum',   win:1.5,
+   desc:'The illuminated rim of the Bay of Rainbows rises above the terminator while the bay floor remains in shadow.'},
+  {angle:258, name:'Straight Wall (Rupes Recta) \u2014 Waning', win:2,
+   desc:'The Straight Wall appears as a bright ridge when illuminated from the west during the waning phase.'},
+];
+const _LUNAR_FX_MAP = Object.fromEntries(LUNAR_EFFECTS.map(e=>[e.angle,e]));
+
 function _computeMoonPhaseEvents() {
   const evts=[];
   const today=new Date();
@@ -5873,7 +5889,7 @@ function _computeMoonPhaseEvents() {
     const jd=startJD+i;
     const curr=_moonPhaseAngle(jd);
 
-    for(const target of [0,45,90,135,180,225,270,315]){
+    for(const target of [0,20,45,50,70,90,98,125,135,180,225,258,270,315]){
       let hit=false, approxJD=jd;
       if(target===0){
         if(prev>340&&curr<20){
@@ -5933,6 +5949,14 @@ function _computeMoonPhaseEvents() {
           evts.push({cat:'Moon',subtype:'waning_crescent',date:dateStr,jd:approxJD,
             name:'🌘 Waning Crescent',
             note:'Thin crescent visible in the eastern sky before sunrise. Good for crescent photography.'});
+        } else {
+          const fx=_LUNAR_FX_MAP[target];
+          if(fx){
+            const t0=_jdToHHMM(approxJD-fx.win/24), t1=_jdToHHMM(approxJD+fx.win/24);
+            evts.push({cat:'Moon',subtype:'chiaroscuro',date:dateStr,jd:approxJD,
+              name:`🔭 ${fx.name}`,
+              note:`Window ~${t0}–${t1} UTC (±${fx.win}h). ${fx.desc}`});
+          }
         }
       }
     }
@@ -5957,6 +5981,97 @@ function _computeMoonPhaseEvents() {
   }
 
   return evts;
+}
+
+function _jdToHHMM(jd) {
+  const d=new Date((jd-2440587.5)*86400000);
+  const h=d.getUTCHours(), m=d.getUTCMinutes();
+  return `${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
+}
+
+function _moonRADec(jd) {
+  const T=(jd-2451545)/36525, p=Math.PI/180;
+  const Lm=((218.3164477+481267.88123421*T)%360+360)%360;
+  const D=((297.8501921+445267.1114034*T)%360+360)%360;
+  const M=((357.5291092+35999.0502909*T)%360+360)%360;
+  const Mp=((134.9633964+477198.8675055*T)%360+360)%360;
+  const F=((93.2720950+483202.0175233*T)%360+360)%360;
+  const lonM=Lm+6.289*Math.sin(Mp*p)-1.274*Math.sin((2*D-Mp)*p)+0.658*Math.sin(2*D*p)
+    -0.214*Math.sin(2*Mp*p)-0.186*Math.sin(M*p)-0.114*Math.sin(2*F*p)
+    +0.059*Math.sin((2*D-2*Mp)*p)+0.057*Math.sin((2*D-M-Mp)*p)
+    +0.053*Math.sin((2*D+Mp)*p)+0.046*Math.sin((2*D-M)*p)
+    -0.041*Math.sin((Mp-M)*p)+0.035*Math.sin(D*p)-0.031*Math.sin((Mp+M)*p);
+  const latM=5.128*Math.sin(F*p)+0.280*Math.sin((Mp+F)*p)-0.277*Math.sin((Mp-F)*p)
+    -0.173*Math.sin((2*D-F)*p)-0.055*Math.sin((2*D-Mp-F)*p)
+    +0.046*Math.sin((2*D+F)*p)+0.033*Math.sin((Mp+2*F)*p);
+  const eps=23.439*p, lonR=lonM*p, latR2=latM*p;
+  const ra=(Math.atan2(Math.sin(lonR)*Math.cos(eps)-Math.tan(latR2)*Math.sin(eps),Math.cos(lonR))*180/Math.PI+360)%360;
+  const dec=Math.asin(Math.sin(latR2)*Math.cos(eps)+Math.cos(latR2)*Math.sin(eps)*Math.sin(lonR));
+  return {ra, dec};
+}
+
+function _angSepDeg(ra1, dec1rad, ra2, dec2rad) {
+  const dr=(ra1-ra2)*Math.PI/180;
+  return Math.acos(Math.max(-1,Math.min(1,
+    Math.sin(dec1rad)*Math.sin(dec2rad)+Math.cos(dec1rad)*Math.cos(dec2rad)*Math.cos(dr)
+  )))*180/Math.PI;
+}
+
+let _moonConjCache=null, _moonConjCacheYear=null;
+
+function getMoonConjEvents() {
+  const yr=new Date().getFullYear();
+  if(_moonConjCache&&_moonConjCacheYear===yr) return _moonConjCache;
+  _moonConjCacheYear=yr;
+  _moonConjCache=_computeMoonPlanetConjunctions();
+  return _moonConjCache;
+}
+
+function _computeMoonPlanetConjunctions() {
+  const evts=[];
+  const today=new Date();
+  const startJD=toJD(new Date(Date.UTC(today.getUTCFullYear()-1,0,1)));
+  const endJD  =toJD(new Date(Date.UTC(today.getUTCFullYear()+2,0,1)));
+  const nDays  =Math.floor(endJD-startJD);
+
+  for(const planet of ['Mercury','Venus','Mars','Jupiter','Saturn']){
+    let inClose=false, minSep=999, minJD=null;
+    for(let i=0;i<=nDays;i++){
+      const jd=startJD+i;
+      const moon=_moonRADec(jd);
+      const pl=planetGeocentric(planet,jd);
+      const sep=_angSepDeg(moon.ra,moon.dec,pl.ra,pl.dec);
+      if(sep<5){
+        inClose=true;
+        if(sep<minSep){minSep=sep;minJD=jd;}
+      } else if(inClose){
+        _pushMoonConjEvent(evts,planet,minJD,minSep);
+        inClose=false;minSep=999;minJD=null;
+      }
+    }
+    if(inClose&&minJD) _pushMoonConjEvent(evts,planet,minJD,minSep);
+  }
+  return evts;
+}
+
+function _pushMoonConjEvent(evts,planet,jd,sep) {
+  // Refine minimum to nearest hour by scanning ±24h
+  let rjd=jd, rsep=sep;
+  for(let h=-24;h<=24;h++){
+    const j2=jd+h/24;
+    const m2=_moonRADec(j2), p2=planetGeocentric(planet,j2);
+    const s2=_angSepDeg(m2.ra,m2.dec,p2.ra,p2.dec);
+    if(s2<rsep){rsep=s2;rjd=j2;}
+  }
+  const d=new Date((rjd-2440587.5)*86400000);
+  const dateStr=d.toISOString().slice(0,10);
+  const {dist}=planetGeocentric(planet,rjd);
+  evts.push({
+    cat:'Moon',subtype:'moon_planet_conj',planet,
+    date:dateStr,jd:rjd,
+    name:`🌙 Moon\u2013${planet} Conjunction`,
+    note:`Moon passes ${rsep.toFixed(1)}\u00b0 from ${planet} (closest ~${_jdToHHMM(rjd)} UTC). ${planet} at ${dist.toFixed(2)} AU.`
+  });
 }
 
 // ── CELESTIAL & SEASONAL EVENTS ───────────────────────────────────────────
@@ -6095,7 +6210,7 @@ function renderEventsPanel() {
     cutoff.setMonth(cutoff.getMonth() + monthsAhead);
     cutoffStr = cutoff.toISOString().slice(0, 10);
   }
-  let events = [...CELESTIAL_EVENTS, ...getPlanetEvents(), ...getMoonPhaseEvents()].filter(e => {
+  let events = [...CELESTIAL_EVENTS, ...getPlanetEvents(), ...getMoonPhaseEvents(), ...getMoonConjEvents()].filter(e => {
     if (activeEventCat && e.cat !== activeEventCat) return false;
     if (eventsUpcomingOnly && e.date < today) return false;
     if (cutoffStr && e.date > cutoffStr) return false;
