@@ -86,7 +86,8 @@ html.light #events-panel{background:rgba(246,248,250,.99)!important}
 #events-upcoming-toggle{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0}
 .ev-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:12px;font-size:10px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
 .ev-filter-btn.active{background:rgba(88,166,255,.12);border-color:var(--accent);color:var(--accent)}
-#events-cat-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px;flex-shrink:0}
+#events-cat-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;flex-shrink:0}
+#events-computed-note{font-size:9px;font-style:italic;color:var(--muted);margin-bottom:6px;line-height:1.4;flex-shrink:0}
 html.light .btn{background:var(--surface);border-color:var(--border);color:var(--text)}
 html.light .az-toggle-btn:not(.active){opacity:0.7;background:transparent!important}
 html.light #tz-toggle-btn,html.light #fmt-24h-btn{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)!important}
@@ -756,6 +757,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
         </div>
         <div id="events-upcoming-toggle"></div>
         <div id="events-cat-row"></div>
+        <div id="events-computed-note"></div>
         <div class="spot-count" id="events-count"></div>
         <div id="events-list"></div>
       </div>
@@ -6032,11 +6034,22 @@ function setEventsUpcoming(val) {
 function buildEventsCatRow() {
   const row = document.getElementById('events-cat-row');
   if (!row) return;
+  const COMPUTED_CATS = new Set(['Moon','Planet']);
   row.innerHTML =
     `<button class="ev-filter-btn${activeEventCat===null?' active':''}" onclick="setEventCat(null)">All</button>` +
-    EVENTS_CATEGORIES.map(c =>
-      `<button class="ev-filter-btn${activeEventCat===c?' active':''}" onclick="setEventCat('${c}')">${EVENTS_CAT_LABELS[c]||c}</button>`
-    ).join('');
+    EVENTS_CATEGORIES.map(c => {
+      const label = (EVENTS_CAT_LABELS[c]||c) + (COMPUTED_CATS.has(c) ? '*' : '');
+      return `<button class="ev-filter-btn${activeEventCat===c?' active':''}" onclick="setEventCat('${c}')">${label}</button>`;
+    }).join('');
+  const note = document.getElementById('events-computed-note');
+  if (note) {
+    const active = activeEventCat;
+    if (active === 'Moon' || active === 'Planet' || active === null) {
+      note.textContent = '* Moon and Planets include dynamically computed events with distance and rise/set data.';
+    } else {
+      note.textContent = '';
+    }
+  }
 }
 
 function setEventCat(cat) {
