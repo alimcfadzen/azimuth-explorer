@@ -6127,7 +6127,7 @@ const CELESTIAL_EVENTS = [
   { date:'2026-12-21', name:'Milky Way Season Closes',   cat:'MilkyWay',    note:'Galactic core sets with the sun; dark-sky window narrows until spring.' },
 ];
 
-const EVENTS_CATEGORIES = [...new Set(CELESTIAL_EVENTS.map(e => e.cat)), 'Planet'];
+const EVENTS_CATEGORIES = [...new Set(CELESTIAL_EVENTS.map(e => e.cat)), 'Moon', 'Planet'];
 const EVENTS_CAT_LABELS = { Solstice:'Solstice/Equinox', Meteor:'Meteor Shower', Eclipse:'Eclipse', Moon:'Moon', Environmental:'Environmental', MilkyWay:'Milky Way', Planet:'Planets' };
 let activeEventCat = null;
 let eventsUpcomingOnly = true;
