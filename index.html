@@ -53,7 +53,7 @@ html.light #spots-search{background:var(--bg3);color:var(--text)}
 html.light #spots-panel{background:rgba(246,248,250,.99)!important}
 html.light #events-panel{background:rgba(246,248,250,.99)!important}
 #events-panel{
-  position:absolute;top:14px;left:14px;right:826px;
+  position:absolute;top:14px;left:826px;right:14px;
   background:rgba(13,17,23,.96);border:1px solid var(--border);
   border-radius:10px;z-index:600;
   max-height:calc(100% - 28px);display:none;flex-direction:column;
@@ -213,7 +213,7 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 #tooltip .tt-mw-extra{color:var(--muted);font-size:10px;margin-top:3px;opacity:.85}
 
 /* AZ FINDER */
-#az-panel{position:absolute;right:14px;background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:10px;padding:12px 14px;z-index:500;width:218px;backdrop-filter:blur(10px);display:none}
+#az-panel{position:absolute;left:14px;background:rgba(13,17,23,.93);border:1px solid var(--border);border-radius:10px;padding:12px 14px;z-index:500;width:218px;backdrop-filter:blur(10px);display:none}
 #az-panel h3{font-size:10px;font-family:'Inter',sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 #body-az{overflow-y:auto!important}
 #altHeight,#altDist,#altHeightUnit,#altDistUnit{font-size:10px!important}
@@ -358,7 +358,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 .panel-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;flex-shrink:0}
 .panel-close:hover{color:var(--text)}
 #spots-panel{
-  position:absolute;top:14px;right:528px;
+  position:absolute;top:14px;left:528px;
   background:rgba(13,17,23,.96);border:1px solid var(--border);
   border-radius:10px;z-index:600;width:280px;
   max-height:calc(100% - 28px);display:none;flex-direction:column;
@@ -443,7 +443,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 .sr-item small{color:var(--muted);display:block;font-size:10px;margin-top:1px}
 
 /* ── ISS PANEL ──────────────────────────────────────────────────── */
-#iss-panel{position:absolute;top:14px;right:250px;width:260px;background:rgba(13,17,23,.95);border:1px solid var(--border);border-radius:10px;z-index:600;font-family:'Inter',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.6);display:none}
+#iss-panel{position:absolute;top:14px;left:250px;width:260px;background:rgba(13,17,23,.95);border:1px solid var(--border);border-radius:10px;z-index:600;font-family:'Inter',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.6);display:none;overflow:hidden}
 #iss-panel.open{display:block}
 #iss-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)}
 #iss-panel-header h3{margin:0;font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
@@ -4632,23 +4632,13 @@ function updatePanelPositions() {
     azPanel.style.bottom = lift + 'px';
     azPanel.style.maxHeight = (window.innerHeight - lift - 14) + 'px';
   }
+  const issPanel    = document.getElementById('iss-panel');
   const spotsPanel  = document.getElementById('spots-panel');
   const eventsPanel = document.getElementById('events-panel');
-  if (spotsPanel)  { spotsPanel.style.bottom  = lift + 'px'; spotsPanel.style.maxHeight  = (window.innerHeight - lift - 14) + 'px'; }
-  if (eventsPanel) {
-    eventsPanel.style.bottom = lift + 'px';
-    eventsPanel.style.maxHeight = (window.innerHeight - lift - 14) + 'px';
-    // Position events to the right of the observer info panel when it is visible
-    const obsPanel = document.getElementById('observer-info-panel');
-    const mapC = document.getElementById('map-container');
-    if (obsPanel && mapC && obsPanel.offsetWidth > 0 && obsPanel.style.display !== 'none') {
-      const obsBR = obsPanel.getBoundingClientRect();
-      const mcBR  = mapC.getBoundingClientRect();
-      eventsPanel.style.left = Math.max(14, Math.round(obsBR.right - mcBR.left) + 10) + 'px';
-    } else {
-      eventsPanel.style.left = '14px';
-    }
-  }
+  const panelH = (window.innerHeight - lift - 14) + 'px';
+  if (issPanel)    { issPanel.style.bottom    = lift + 'px'; issPanel.style.maxHeight    = panelH; }
+  if (spotsPanel)  { spotsPanel.style.bottom  = lift + 'px'; spotsPanel.style.maxHeight  = panelH; }
+  if (eventsPanel) { eventsPanel.style.bottom = lift + 'px'; eventsPanel.style.maxHeight = panelH; }
   if (dock) dock.style.bottom = (tbH + 8) + 'px';
 }
 
