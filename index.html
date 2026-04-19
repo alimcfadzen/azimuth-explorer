@@ -55,7 +55,7 @@ html.light #events-panel{background:rgba(246,248,250,.99)!important}
 #events-panel{
   position:absolute;top:14px;left:14px;
   background:rgba(13,17,23,.96);border:1px solid var(--border);
-  border-radius:10px;z-index:600;width:440px;
+  border-radius:10px;z-index:600;width:360px;
   max-height:calc(100% - 28px);display:none;flex-direction:column;
   backdrop-filter:blur(12px);overflow:hidden;
 }
@@ -358,9 +358,9 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 .panel-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;flex-shrink:0}
 .panel-close:hover{color:var(--text)}
 #spots-panel{
-  position:absolute;top:14px;left:468px;
+  position:absolute;top:14px;right:528px;
   background:rgba(13,17,23,.96);border:1px solid var(--border);
-  border-radius:10px;z-index:600;width:440px;
+  border-radius:10px;z-index:600;width:280px;
   max-height:calc(100% - 28px);display:none;flex-direction:column;
   backdrop-filter:blur(12px);overflow:hidden;
 }
@@ -3482,6 +3482,7 @@ async function updateObserverInfoPanel() {
     }
     panel.innerHTML = html;
     panel.style.display = 'block';
+    setTimeout(updatePanelPositions, 0);
   }
 
   render();
@@ -4635,7 +4636,20 @@ function updatePanelPositions() {
   const spotsPanel  = document.getElementById('spots-panel');
   const eventsPanel = document.getElementById('events-panel');
   if (spotsPanel)  { spotsPanel.style.bottom  = lift + 'px'; spotsPanel.style.maxHeight  = (window.innerHeight - lift - 14) + 'px'; }
-  if (eventsPanel) { eventsPanel.style.bottom = lift + 'px'; eventsPanel.style.maxHeight = (window.innerHeight - lift - 14) + 'px'; }
+  if (eventsPanel) {
+    eventsPanel.style.bottom = lift + 'px';
+    eventsPanel.style.maxHeight = (window.innerHeight - lift - 14) + 'px';
+    // Position events to the right of the observer info panel when it is visible
+    const obsPanel = document.getElementById('observer-info-panel');
+    const mapC = document.getElementById('map-container');
+    if (obsPanel && mapC && obsPanel.offsetWidth > 0 && obsPanel.style.display !== 'none') {
+      const obsBR = obsPanel.getBoundingClientRect();
+      const mcBR  = mapC.getBoundingClientRect();
+      eventsPanel.style.left = Math.max(14, Math.round(obsBR.right - mcBR.left) + 10) + 'px';
+    } else {
+      eventsPanel.style.left = '14px';
+    }
+  }
   if (dock) dock.style.bottom = (tbH + 8) + 'px';
 }
 
