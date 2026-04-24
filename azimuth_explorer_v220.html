@@ -4613,6 +4613,7 @@ function updatePanelPositions() {
   const tbH = tb ? tb.offsetHeight : 0;
   const dockH = dock ? dock.offsetHeight : 0;
   const lift = tbH + Math.max(dockH + 18, 42);
+  const panelH = (window.innerHeight - lift - 14) + 'px';
   // Lift bottom-anchored panels
   const azPanel = document.getElementById('az-panel');
   if (azPanel) {
@@ -4622,7 +4623,6 @@ function updatePanelPositions() {
   const issPanel    = document.getElementById('iss-panel');
   const spotsPanel  = document.getElementById('spots-panel');
   const eventsPanel = document.getElementById('events-panel');
-  const panelH = (window.innerHeight - lift - 14) + 'px';
   // ISS sizes to content — no bottom stretch
   if (eventsPanel) { eventsPanel.style.bottom = lift + 'px'; eventsPanel.style.maxHeight = panelH; }
   if (spotsPanel) { spotsPanel.style.bottom = lift + 'px'; spotsPanel.style.maxHeight = panelH; }
