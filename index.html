@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sun & Moon Azimuth Explorer</title>
+<title>Astrolabe</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -492,7 +492,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
 
     <!-- TITLE ROW -->
     <div class="tb-row" style="padding:4px 0;border-bottom:1px solid rgba(48,54,61,.8)">
-      <span class="tb-title" id="app-title-bar" style="font-size:14px;letter-spacing:.1em;color:var(--accent)">☀︎ ☽ ✦ AZIMUTH EXPLORER</span>
+      <span class="tb-title" id="app-title-bar" style="font-size:14px;letter-spacing:.1em;color:var(--accent)">☀︎ ☽ ✦ ASTROLABE</span>
       <div class="tb-group" style="gap:4px;margin-left:auto">
         <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
         <button class="btn" id="btnEvents" onclick="toggleEventsPanel()" title="Celestial &amp; Seasonal Events">🔭 Events</button>
@@ -4475,7 +4475,7 @@ async function saveScreenshot() {
     // Title
     ctx.font = `bold ${13 * dpr / dpr}px 'Inter', Arial, sans-serif`;
     ctx.fillStyle = '#e6edf3';
-    ctx.fillText('☀︎ ☽ ✦ Azimuth Explorer', 14, sy + 12);
+    ctx.fillText('☀︎ ☽ ✦ Astrolabe', 14, sy + 12);
 
     // Date + location
     const dateStr = document.getElementById('datePicker').value;
@@ -4499,7 +4499,7 @@ async function saveScreenshot() {
     // Watermark
     ctx.font = `${10 * dpr / dpr}px "Inter", sans-serif`;
     ctx.fillStyle = '#444c56';
-    ctx.fillText('Generated with Azimuth Explorer', out.width / dpr - ctx.measureText('Generated with Azimuth Explorer').width - 14, sy + 28);
+    ctx.fillText('Generated with Astrolabe', out.width / dpr - ctx.measureText('Generated with Astrolabe').width - 14, sy + 28);
 
     ctx.restore();
 
