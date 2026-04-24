@@ -493,6 +493,13 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
     <!-- TITLE ROW -->
     <div class="tb-row" style="padding:4px 0;border-bottom:1px solid rgba(48,54,61,.8)">
       <span class="tb-title" id="app-title-bar" style="font-size:14px;letter-spacing:.1em;color:var(--accent)">☀︎ ☽ ✦ AZIMUTH EXPLORER</span>
+      <div class="tb-group" style="gap:4px;margin-left:auto">
+        <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
+        <button class="btn" id="btnEvents" onclick="toggleEventsPanel()" title="Celestial &amp; Seasonal Events">🔭 Events</button>
+        <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="My Library">📂 Library</button>
+        <button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
+        <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
+      </div>
     </div>
 
     <!-- ROW 1 -->
@@ -590,24 +597,13 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <div class="tb-group" style="gap:4px;align-items:center">
         <button class="btn" id="btnAzFinder" onclick="toggleAzFinder()">⊹ Azimuth Finder</button>
         <button class="btn" id="btnISS" onclick="toggleISS()">🛸 ISS</button>
-        <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
-        <button class="btn" id="btnEvents" onclick="toggleEventsPanel()" title="Celestial &amp; Seasonal Events">🔭 Events</button>
       </div>
 
       <!-- hidden MW btn for JS compat -->
       <button style="display:none" id="btnMW" onclick="toggle('mw')"></button>
 
-      <div class="tb-sep"></div>
-
       <!-- hidden Phase btn kept for JS compat -->
       <button style="display:none" id="btnPhase" onclick="setDateMode('phase');toggleDateDropdown()"></button>
-
-      <!-- SAVE BUTTONS -->
-      <button class="btn" id="btnLibrary" onclick="toggleLibrary()" title="My Library">📂 Library</button>
-      <div class="tb-group" style="gap:4px">
-<button class="btn" onclick="openSavePlan()" title="Save Plan">💾 Plan</button>
-        <button class="btn" onclick="openSaveLocation()" title="Save Location">💾 Location</button>
-      </div>
 
       <!-- THEME TOGGLE pushed to far right -->
       <button class="btn" id="btnTheme" onclick="toggleTheme()" title="Toggle light/dark mode" style="margin-left:auto">☀ Light</button>
