@@ -400,6 +400,19 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 #mobile-menu{display:none;position:absolute;top:100%;right:0;left:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:1100;padding:8px 12px;flex-direction:column;gap:8px}
 #mobile-menu.open{display:flex}
 #mobile-menu .tb-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+@media(max-width:1200px) and (min-width:901px){
+  .btn{padding:3px 7px;font-size:11px;height:26px;letter-spacing:0}
+  .tb-row{gap:4px}
+  .tb-group{gap:3px}
+  #toolbar{padding:0 8px}
+}
+@media(max-width:1050px) and (min-width:901px){
+  .btn{padding:2px 5px;font-size:11px;height:24px}
+  .tb-row{gap:3px}
+  .tb-group{gap:2px}
+  .tb-sep{display:none}
+  .tb-label{display:none}
+}
 @media(max-width:900px){
   #toolbar-rows{display:none}
   #hamburger-btn{display:flex}
