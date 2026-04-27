@@ -61,6 +61,6 @@
     </g>
   </svg>
   <!-- Wordmark -->
-  <text x="600" y="138" text-anchor="middle" fill="#c9d8ec" font-family="'Inter',sans-serif" font-size="72" font-weight="300" letter-spacing="8">ASTROLABE</text>
-  <text x="600" y="218" text-anchor="middle" fill="#4a6fa5" font-family="'Inter',sans-serif" font-size="72" font-weight="300" letter-spacing="12">EXPLORER</text>
+  <text x="600" y="128" text-anchor="middle" fill="#c9d8ec" font-family="'Inter',sans-serif" font-size="88" font-weight="300" letter-spacing="8">ASTROLABE</text>
+  <text x="600" y="222" text-anchor="middle" fill="#c9d8ec" font-family="'Inter',sans-serif" font-size="88" font-weight="300" letter-spacing="12">EXPLORER</text>
 </svg>
