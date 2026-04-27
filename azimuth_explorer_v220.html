@@ -492,7 +492,13 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
 
     <!-- TITLE ROW -->
     <div class="tb-row" style="padding:4px 0;border-bottom:1px solid rgba(48,54,61,.8)">
-      <img id="app-title-bar" src="logo-light.svg" height="68" style="display:block;flex-shrink:0" alt="Astrolabe Explorer">
+      <span id="app-title-bar" style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <img src="compass.png" height="52" style="display:block" alt="">
+        <span style="display:flex;flex-direction:column;justify-content:center;line-height:1.1">
+          <span style="font-family:'Inter',sans-serif;font-size:13px;font-weight:300;letter-spacing:.18em;color:#1e2d4a;text-transform:uppercase">Astrolabe</span>
+          <span style="font-family:'Inter',sans-serif;font-size:13px;font-weight:300;letter-spacing:.22em;color:#1e2d4a;text-transform:uppercase">Explorer</span>
+        </span>
+      </span>
       <div class="tb-group" style="gap:4px;margin-left:auto">
         <button class="btn" id="btnSpots" onclick="toggleSpotsPanel()" title="Notable Spots">★ Spots</button>
         <button class="btn" id="btnEvents" onclick="toggleEventsPanel()" title="Celestial &amp; Seasonal Events">🔭 Events</button>
