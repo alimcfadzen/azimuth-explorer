@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Astrolabe</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -38,13 +38,16 @@ html.light #iss-panel,
 html.light #pin-mode-bar,
 html.light #observer-info-panel,
 html.light #tooltip{background:rgba(246,248,250,.97)!important}
-#observer-info-panel{display:none;background:rgba(22,27,34,.92);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11px;line-height:1.55;color:var(--text);min-width:160px;max-width:210px;pointer-events:none;margin-top:4px;backdrop-filter:blur(4px)}
+#observer-info-panel{display:none;background:rgba(22,27,34,.92);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;line-height:1.55;color:var(--text);min-width:160px;max-width:210px;pointer-events:auto;margin-top:4px;backdrop-filter:blur(4px)}
 #observer-info-panel .oi-row{display:flex;justify-content:space-between;gap:8px}
 #observer-info-panel .oi-label{color:var(--muted);opacity:0.7;white-space:nowrap}
 #observer-info-panel .oi-val{text-align:right;font-variant-numeric:tabular-nums}
+#observer-info-panel .oi-close{position:absolute;top:5px;right:6px;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;line-height:1;padding:0;opacity:0.6}
+#observer-info-panel .oi-close:hover{opacity:1}
+#observer-info-panel{position:relative}
 html.light #library-panel{background:rgba(246,248,250,.99)!important}
 html.light .minimized-chip{background:rgba(246,248,250,.96)!important}
-html.light #time-info-block{background:rgba(246,248,250,.88)!important}
+
 html.light #modal-box{background:var(--bg2)}
 html.light #modal-input{background:var(--bg3);color:var(--text)}
 html.light .spot-item,html.light .panel-item{background:transparent}
@@ -106,7 +109,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter'
 #app{display:flex;flex-direction:column;height:100vh}
 
 /* TOOLBAR */
-#toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 12px;display:flex;flex-direction:column;flex-shrink:0;z-index:1000}
+#toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,16px)) 0 max(16px,env(safe-area-inset-left,16px));display:flex;flex-direction:column;flex-shrink:0;z-index:1000}
 .tb-row{display:flex;align-items:center;gap:6px;padding:5px 0}
 .tb-row+.tb-row{border-top:1px solid rgba(48,54,61,.6)}
 .tb-title{font-size:12px;font-weight:700;color:var(--tb-label);letter-spacing:.06em;white-space:nowrap;text-transform:uppercase}
@@ -131,7 +134,7 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 
 /* MAP */
 #map-container{flex:1;position:relative;overflow:hidden}
-#map{width:100%;height:100%;background:#0a0f1a}
+#map{width:100%;height:100%;background:#0a0f1a;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 .leaflet-tile{filter:none}
 .satellite-mode .leaflet-tile{filter:none}
 .leaflet-container{background:#0a0f1a}
@@ -149,19 +152,20 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 .loc-star-marker:hover{transform:scale(1.3)}
 
 /* TIME BAR */
-#time-bar{position:absolute;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:0;z-index:500;display:block}
+#time-bar{position:absolute;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:0 max(12px,env(safe-area-inset-right,12px)) env(safe-area-inset-bottom,0px) max(12px,env(safe-area-inset-left,12px));z-index:500;display:block}
 #alt-graph-wrap{position:relative;width:100%}
 #alt-canvas{width:100%;max-width:100%;display:block;cursor:crosshair;box-sizing:border-box}
-#time-info-block{position:absolute;left:20px;top:8px;z-index:10;background:rgba(13,17,23,0.72);border-radius:5px;padding:4px 8px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:auto}
-#time-bar-slider-row{display:flex;align-items:center;gap:8px;padding:2px 20px;margin-top:0}
+#time-info-block{position:absolute;right:14px;bottom:220px;z-index:501;background:rgba(13,17,23,0.82);border:1px solid rgba(255,255,255,0.10);border-radius:8px;padding:5px 9px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:auto;backdrop-filter:blur(4px)}
+html.light #time-info-block{background:rgba(246,248,250,.90)!important;border-color:rgba(0,0,0,0.12)!important}
+#time-bar-slider-row{display:flex;align-items:center;gap:8px;padding:10px 0 8px;margin-top:0;overflow:visible}
 #time-bar-label{font-size:13px;color:#e6edf3;font-family:'Inter',sans-serif;white-space:nowrap;min-width:74px;font-weight:600}
 #time-display{font-size:13px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;text-align:left;line-height:1.3;white-space:nowrap}
 #play-btn{width:26px;height:26px;border-radius:50%;background:var(--accent);border:none;color:#000;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;padding:0}
 #play-btn:hover{background:#79bcff}
-#time-slider-wrap{flex:1;position:relative;height:18px;display:flex;align-items:center}
-#time-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;background:rgba(255,255,255,0.15);border:none}
-#time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);cursor:pointer}
-#time-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);cursor:pointer}
+#time-slider-wrap{flex:1;position:relative;height:24px;display:flex;align-items:center;overflow:visible}
+#time-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;cursor:pointer;background:rgba(255,255,255,0.18);border:none;overflow:visible}
+#time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:40px;border-radius:9px;background:var(--accent);border:2px solid var(--bg);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+#time-slider::-moz-range-thumb{width:18px;height:40px;border-radius:9px;background:var(--accent);border:2px solid var(--bg);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.4)}
 #tide-graph-wrap{margin-top:4px}
 #tide-canvas{height:55px;border-radius:3px;display:block;max-width:100%;box-sizing:border-box}
 #slider-readout{display:flex;gap:10px;font-size:11px;font-family:'Inter',sans-serif;margin-top:3px;flex-wrap:wrap;font-weight:500}
@@ -255,10 +259,27 @@ input[type=date]:focus{outline:none;border-color:rgba(0,0,0,.5)}
 .strip-label{font-size:13px;font-weight:700;font-family:'Inter',sans-serif;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
 .strip-value{font-size:13px;font-family:'Inter',sans-serif;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
 #strip-sunmoon{display:none}
-#strip-sunmoon-inner{display:flex;align-items:center;justify-content:center;padding:5px 14px;gap:6px;overflow-x:auto;flex-wrap:nowrap;width:100%;box-sizing:border-box}
-.az-toggle-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;white-space:nowrap;flex-shrink:0;transition:border-color .15s,background .15s,opacity .15s;opacity:.45}
-.az-toggle-btn.active{opacity:1}
+#strip-sunmoon{position:relative;container-type:inline-size}
+#strip-sunmoon-inner{display:flex;align-items:center;justify-content:flex-start;padding:5px 14px;gap:6px;overflow-x:auto;flex-wrap:nowrap;width:100%;box-sizing:border-box;scroll-behavior:smooth}
 #strip-sunmoon-inner::-webkit-scrollbar{display:none}
+/* Scroll hint — fading right edge + chevron */
+#strip-sunmoon::after{content:'›';position:absolute;right:0;top:0;bottom:0;width:36px;background:linear-gradient(to right,transparent,var(--surface) 70%);display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:16px;color:var(--muted);pointer-events:none;opacity:0.8}
+.az-toggle-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;white-space:nowrap;flex-shrink:0;transition:border-color .15s,background .15s,opacity .15s;opacity:.45}
+.az-toggle-btn.active{opacity:1}
+/* Responsive content levels inside each button */
+.ev-full{display:inline-flex;align-items:center;gap:4px}
+.ev-compact{display:none;align-items:center;gap:3px}
+.ev-icon{display:none;align-items:center;gap:2px;font-size:13px}
+/* medium: strip container 320-599px → compact */
+@container (max-width:599px){
+  .ev-full{display:none}
+  .ev-compact{display:inline-flex}
+}
+/* small: strip container <320px → icon only */
+@container (max-width:319px){
+  .ev-compact{display:none}
+  .ev-icon{display:inline-flex}
+}
 #strip-pins{display:none}
 #strip-pins-inner{display:flex;align-items:center;justify-content:flex-start;padding:5px 0;gap:0;overflow-x:auto;flex-wrap:nowrap}
 #strip-pins-inner::-webkit-scrollbar{display:none}
@@ -416,7 +437,7 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
   .btn{padding:3px 7px;font-size:11px;height:26px;letter-spacing:0}
   .tb-row{gap:4px}
   .tb-group{gap:3px}
-  #toolbar{padding:0 8px}
+  #toolbar{padding:env(safe-area-inset-top,0px) max(8px,env(safe-area-inset-right,8px)) 0 max(8px,env(safe-area-inset-left,8px))}
 }
 @media(max-width:1050px) and (min-width:901px){
   .btn{padding:2px 5px;font-size:11px;height:24px}
@@ -494,6 +515,10 @@ html.light #risesetstrip span.rs-off{background:transparent!important;border-col
 #ddDatePicker{flex:1;background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:3px 6px;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;height:28px;color-scheme:dark;cursor:pointer;outline:none}
 html.light #ddDatePicker{background:var(--surface);border-color:var(--border);color:var(--text);color-scheme:light}
 .leaflet-top,.leaflet-bottom{z-index:500 !important}
+.leaflet-top.leaflet-left{margin-left:max(4px,env(safe-area-inset-left,4px))}
+.leaflet-top.leaflet-right{margin-right:max(4px,env(safe-area-inset-right,4px))}
+.leaflet-bottom.leaflet-left{margin-left:max(4px,env(safe-area-inset-left,4px))}
+.leaflet-bottom.leaflet-right{margin-right:max(4px,env(safe-area-inset-right,4px))}
 </style>
 </head>
 <body>
@@ -689,6 +714,15 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
 
     <div id="minimized-dock" class="minimized-dock"></div>
     <div id="geo-status" style="display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(13,17,23,0.96);border:1px solid var(--border);border-radius:8px;padding:6px 14px;z-index:700;font-size:12px;color:var(--accent);font-family:'Inter',sans-serif;pointer-events:auto;line-height:1.5;text-align:center"></div>
+    <!-- TIME/DATE BLOCK — floating bottom-right of map -->
+    <div id="time-info-block">
+      <div id="slider-date-display" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;line-height:1.2;white-space:nowrap;letter-spacing:.03em"></div>
+      <div id="time-display"></div>
+      <div style="display:flex;gap:4px">
+        <button id="tz-toggle-btn" onclick="toggleTimezone()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--muted);padding:1px 6px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">→ UTC</button>
+        <button id="fmt-24h-btn" onclick="toggle24h()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--muted);padding:1px 6px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">24H</button>
+      </div>
+    </div>
 
 
 
@@ -893,14 +927,6 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
       <!-- ALTITUDE GRAPH -->
       <div id="alt-graph-wrap" style="position:relative">
         <canvas id="alt-canvas"></canvas>
-        <div id="time-info-block">
-          <div id="slider-date-display" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;line-height:1.2;white-space:nowrap;letter-spacing:.03em"></div>
-          <div id="time-display"></div>
-          <div style="display:flex;gap:4px">
-            <button id="tz-toggle-btn" onclick="toggleTimezone()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--muted);padding:1px 6px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">→ UTC</button>
-            <button id="fmt-24h-btn" onclick="toggle24h()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--muted);padding:1px 6px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">24H</button>
-          </div>
-        </div>
       </div>
       <!-- TIDE ROW: info left (4 rows) + graph right -->
       <div style="display:none"><span id="readout-sun"></span><span id="readout-moon"></span><span id="readout-mw"></span></div>
@@ -917,7 +943,7 @@ html.light #ddDatePicker{background:var(--surface);border-color:var(--border);co
         </div>
       </div>
       <!-- SLIDER ROW -->
-      <div id="time-bar-slider-row" style="display:flex;align-items:center;padding:4px 8px;box-sizing:border-box;background:var(--surface)">
+      <div id="time-bar-slider-row" style="display:flex;align-items:center;padding:10px 0 8px;box-sizing:border-box;background:var(--surface);overflow:visible">
         <div id="time-slider-wrap" style="flex:1;min-width:0">
           <input type="range" id="time-slider" min="0" max="1439" step="1" value="720" style="width:100%">
         </div>
@@ -934,6 +960,7 @@ let map, markerA=null, markerB=null;
 let latA=null,lonA=null,latB=null,lonB=null;
 let pinMode=null;
 let showSun=true,showMoon=true,showMW=true,showISS=false;
+let stripEventTimes = {}; // key → UTC minutes from day start (for slider jump)
 let issTLE=null, tiangongTLE=null, issTransits=[], issLastFetch=null, issFetching=false;
 let useLocalTime=true; // default to browser local time
 let use24h=false;
@@ -1365,35 +1392,26 @@ function initMap() {
     setTimeout(() => { drawAltGraph(); updateTimeDisplay(); }, 100);
   }
 
-  // Geolocation — run always; if no saved pins, also drop Observer pin
-  if (navigator.geolocation) {
-    showGeoStatus('Locating…');
+  // Auto-geolocate only when no saved observer pin — avoids persistent "Locating…"
+  // popup on every reload when the user already has a pinned location.
+  if (navigator.geolocation && latA === null) {
+    showGeoStatus('⌖ Locating…');
     navigator.geolocation.getCurrentPosition(
       pos => {
         const { latitude: lat, longitude: lng } = pos.coords;
         hideGeoStatus();
-        // Fly to user location unless they have a saved map view with pins
-        // Always fly to location; only skip if user has saved pins AND saved map view
-        const hasSavedView = savedState && savedState.mapCenter && savedState.latA != null && savedState.latA !== "null";
-        if (!hasSavedView) flyToVisible(lat, lng, 15);
-        // Auto-place Observer pin only if none was restored
         hiddenEvents.sunRise = false;
         hiddenEvents.sunSet  = false;
-        if (latA === null) {
-          placeMarker('a', lat, lng);
-          if (!hasSavedView) flyToVisible(lat, lng, 15);
-          syncPinButtons();
-          saveState();
-          setTimeout(() => { drawAltGraph(); loadTideForCurrentState(); }, 100);
-        } else {
-          // Pin already restored — ensure canvas sized correctly
-          setTimeout(() => drawAltGraph(), 100);
-        }
+        placeMarker('a', lat, lng);
+        flyToVisible(lat, lng, 15);
+        syncPinButtons();
+        saveState();
+        setTimeout(() => { drawAltGraph(); loadTideForCurrentState(); }, 100);
       },
       err => {
         showGeoStatus(geoErrorMessage(err), true);
       },
-      { timeout: 8000, maximumAge: 60000 }
+      { timeout: 10000, maximumAge: 60000 }
     );
   }
 }
@@ -1657,6 +1675,7 @@ function cancelPinMode() {
 function placeMarker(which, lat, lng) {
   // Will call drawAltGraph after to resize canvas with tide section
   if (which === 'a') {
+    _pinInfoDismissed = false; // re-show info bubble on new placement
     latA = lat; lonA = lng;
     if (markerA) map.removeLayer(markerA);
     markerA = L.marker([lat, lng], {
@@ -1717,6 +1736,12 @@ function onMapClick(e) {
     saveState();
     return;
   }
+  // Auto-place observer on first tap/click when none exists
+  if (!latA) {
+    placeMarker('a', e.latlng.lat, e.latlng.lng);
+    saveState();
+    return;
+  }
   // In month/year mode: click a fan line to jump to that date
   const fanCache = yearMode ? yearCache : (dateMode === 'month' ? monthCache : null);
   if (fanCache && latA) {
@@ -1733,67 +1758,51 @@ function onMapClick(e) {
 }
 
 // ── LONG PRESS TO MOVE OBSERVER PIN ──────────────────────────────────────
-let longPressTimer = null;
 let longPressActive = false;
-const LONG_PRESS_MS = 600;
 
 function initLongPress() {
-  const mapEl = document.getElementById('map');
+  // Helper: move observer to a screen-coordinate point
+  function movePinTo(clientX, clientY) {
+    if (pinMode || !latA) return;
+    const rect = map.getContainer().getBoundingClientRect();
+    const latlng = map.containerPointToLatLng(
+      L.point(clientX - rect.left, clientY - rect.top)
+    );
+    longPressActive = true;
+    placeMarker('a', latlng.lat, latlng.lng);
+    saveState();
+    flashBtn('btnPinA', '● Observer ✓');
+  }
 
-  // Show a visual ring while holding
+  // contextmenu fires on:
+  //   • desktop right-click
+  //   • mobile long-press (iOS Safari, Chrome Android, Chrome iOS)
+  // preventDefault() suppresses the browser "Copy / Search" popup.
+  map.getContainer().addEventListener('contextmenu', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    movePinTo(e.clientX, e.clientY);
+  });
+
+  // Desktop mouse long-hold fallback (for browsers that don't fire contextmenu on hold)
+  let mouseTimer = null;
   const ring = document.createElement('div');
   ring.id = 'long-press-ring';
-  ring.style.cssText = 'position:absolute;width:28px;height:28px;border-radius:50%;border:2px solid var(--pin-a);pointer-events:none;display:none;z-index:450;transform:translate(-50%,-50%);transition:transform 0.6s ease,opacity 0.6s ease;opacity:0.8';
+  ring.style.cssText = 'position:absolute;width:28px;height:28px;border-radius:50%;border:2px solid var(--pin-a);pointer-events:none;display:none;z-index:450;transform:translate(-50%,-50%);opacity:0.8';
   document.getElementById('map-container').appendChild(ring);
 
   map.on('mousedown', e => {
-    if (pinMode) return; // already placing
-    if (!latA) return;   // no observer pin to move
-    longPressActive = false;
-
-    const ring = document.getElementById('long-press-ring');
+    if (e.originalEvent.button !== 0 || pinMode || !latA) return;
     const pt = map.latLngToContainerPoint(e.latlng);
-    ring.style.left = pt.x + 'px';
-    ring.style.top  = pt.y + 'px';
-    ring.style.display = 'block';
-    ring.style.transform = 'translate(-50%,-50%) scale(1)';
-    ring.style.opacity = '0.8';
-
-    longPressTimer = setTimeout(() => {
-      longPressActive = true;
+    ring.style.left = pt.x + 'px'; ring.style.top = pt.y + 'px'; ring.style.display = 'block';
+    mouseTimer = setTimeout(() => {
       ring.style.display = 'none';
-      // Move the observer pin to this location
-      placeMarker('a', e.latlng.lat, e.latlng.lng);
-      saveState();
-      // Brief flash on the pin button to confirm
-      flashBtn('btnPinA', '● Observer ✓');
-    }, LONG_PRESS_MS);
+      movePinTo(e.originalEvent.clientX, e.originalEvent.clientY);
+    }, 600);
   });
-
   map.on('mouseup mousemove', () => {
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-    const ring = document.getElementById('long-press-ring');
-    if (ring) ring.style.display = 'none';
-  });
-
-  // Touch support
-  map.on('touchstart', e => {
-    if (pinMode || !latA) return;
-    const touch = e.originalEvent.touches[0];
-    const latlng = map.containerPointToLatLng(L.point(
-      touch.clientX - map.getContainer().getBoundingClientRect().left,
-      touch.clientY - map.getContainer().getBoundingClientRect().top
-    ));
-    longPressTimer = setTimeout(() => {
-      longPressActive = true;
-      placeMarker('a', latlng.lat, latlng.lng);
-      saveState();
-      flashBtn('btnPinA', '● Observer ✓');
-    }, LONG_PRESS_MS);
-  });
-
-  map.on('touchend touchmove', () => {
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (mouseTimer) { clearTimeout(mouseTimer); mouseTimer = null; }
+    ring.style.display = 'none';
   });
 }
 
@@ -2560,9 +2569,7 @@ function drawAltGraph() {
   // Compute slider margins from layout
   const sliderEl = document.getElementById('time-slider-wrap');
   const sliderRow = document.getElementById('time-bar-slider-row');
-  // Left margin = time-info-block width (119px) + gap (8px) + bar padding (14px)
-  const timeInfoBlock = document.getElementById('time-info-block');
-  let ML = 20;  // time-info-block overlaid on graph; small breathing room on edges
+  let ML = 20;  // small breathing room on left/right edges
   let MR = 20;
   const MT = 8, MB = 22;
   const GW = W - ML - MR;
@@ -2620,10 +2627,11 @@ function drawAltGraph() {
   ctx.fillStyle = isLight ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)';
   ctx.fillText('horizon', ML + 4, toY(0) - 3);
 
-  // Time labels — local hours 0→24 so "12 AM" is always at the left edge
+  // Time labels — thin out on small screens to prevent overlap
+  const labelStep = W < 380 ? 6 : W < 560 ? 4 : 2;
   ctx.fillStyle = isLight ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.55)'; ctx.font = '11px Inter,sans-serif';
-  for (let h = 0; h <= 24; h += 2) {
-    const x = toX(h * 60); // h is local hours; h*60 = local minutes
+  for (let h = 0; h <= 24; h += labelStep) {
+    const x = toX(h * 60);
     const label = use24h ? String(h % 24).padStart(2,'0') : (h===0||h===24?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM');
     const lw = ctx.measureText(label).width;
     const lx = Math.min(Math.max(x - lw/2, ML), ML+GW-lw);
@@ -2797,7 +2805,8 @@ function drawAltGraph() {
       const boxW = maxW + PAD_X * 2;
       const boxH = PAD_Y + LH + lines.length * LH + PAD_Y - 4;
       let bx = curX + 10;
-      if (bx + boxW > ML+GW) bx = curX - boxW - 10;
+      if (bx + boxW > ML + GW) bx = curX - boxW - 10;
+      if (bx < ML) bx = ML;
 
       ctx.fillStyle = isLight ? 'rgba(246,248,250,0.97)' : 'rgba(13,17,23,0.94)';
       ctx.beginPath();
@@ -3413,6 +3422,8 @@ function angDiff(a,b) { let d=a-b; while(d>180)d-=360; while(d<-180)d+=360; retu
 // ── INFO PANEL ────────────────────────────────────────────────────────────
 let _oipLat = null, _oipLon = null, _oipElev = null, _oipDecl = null;
 let _oipLatB = null, _oipLonB = null, _oipElevB = null;
+let _pinInfoDismissed = false;
+function dismissPinInfo() { _pinInfoDismissed = true; const p = document.getElementById('observer-info-panel'); if (p) p.style.display = 'none'; updatePanelPositions(); }
 
 function computeMagDeclination(latDeg, lonDeg) {
   // WMM2020 Gauss coefficients + secular variation to degree 5
@@ -3470,8 +3481,17 @@ async function updateObserverInfoPanel() {
   const panel = document.getElementById('observer-info-panel');
   if (!panel) return;
 
+  // If no pin is placed, hide the bubble entirely
+  if (latA === null) {
+    panel.style.display = 'none';
+    return;
+  }
+
   function render() {
-    let html = `<div style="color:var(--pin-a);font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">● OBSERVER</div>`;
+    // Don't overwrite while dismissed — user closed it intentionally
+    if (_pinInfoDismissed) return;
+    let html = `<button class="oi-close" onclick="dismissPinInfo()" title="Close">✕</button>`;
+    html += `<div style="color:var(--pin-a);font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">● OBSERVER</div>`;
     if (latA !== null) {
       const rows = [
         ['Lat', latA.toFixed(6) + '°'],
@@ -3514,7 +3534,7 @@ async function updateObserverInfoPanel() {
     }
 
     panel.innerHTML = html;
-    panel.style.display = 'block';
+    if (!_pinInfoDismissed) panel.style.display = 'block';
     setTimeout(updatePanelPositions, 0);
   }
 
@@ -3599,18 +3619,36 @@ function updateInfoPanel() {
     // Sort chronologically
     events.sort((a, b) => a.mins - b.mins);
 
-    // Render each event as a toggle button
+    // Cache event times so toggleStripEvent can jump the slider
+    stripEventTimes = {};
+    events.forEach(ev => { if (isFinite(ev.mins)) stripEventTimes[ev.key] = Math.round(ev.mins); });
+
+    // Render each event as a responsive toggle button
     let sm = events.map(ev => {
       const isMoonEv = ev.label === 'Moonrise' || ev.label === 'Moonset';
+      const isRise = ev.label.toLowerCase().includes('rise');
       const moonIcon = `<span style="filter:drop-shadow(0 0 4px #c084fc);font-size:13px;line-height:1">${ph.icon}</span>`;
+      // Pick emoji for each body
+      const emoji = isMoonEv ? ph.icon
+                  : ev.key.startsWith('sun') ? '☀'
+                  : '✦';
+      const arrow = isRise ? '↑' : '↓';
       const labelText = (isMoonEv && showMoon) ? `${moonIcon} ${ev.label}` : ev.label;
+      const nextDayTag = ev.nextDay ? '<sup style="font-size:8px;opacity:0.7;margin-left:1px">+1</sup>' : '';
       const active = !hiddenEvents[ev.key];
       const col = ev.lineColor;
-      return `<button class="az-toggle-btn${active?' active':''}" onclick="toggleStripEvent('${ev.key}')"
-        ${active ? `style="border-color:${col};background:${col}1a"` : ''}>
-        <span style="color:${col};font-weight:700;text-transform:uppercase;letter-spacing:.04em">${labelText}</span>
-        <span style="color:var(--text)">${ev.time}${ev.nextDay ? '<sup style="font-size:8px;opacity:0.7;margin-left:1px">+1</sup>' : ''}</span>
-        <span style="color:${col}">Az ${ev.az.toFixed(1)}°</span>
+      const styleAttr = active ? `style="border-color:${col};background:${col}1a"` : '';
+      return `<button class="az-toggle-btn${active?' active':''}" onclick="toggleStripEvent('${ev.key}')" ${styleAttr}>
+        <span class="ev-full">
+          <span style="color:${col};font-weight:700;text-transform:uppercase;letter-spacing:.04em">${labelText}</span>
+          <span style="color:var(--text)">${ev.time}${nextDayTag}</span>
+          <span style="color:${col}">Az ${ev.az.toFixed(1)}°</span>
+        </span>
+        <span class="ev-compact">
+          <span style="color:${col};font-size:13px">${emoji}${arrow}</span>
+          <span style="color:var(--text);font-size:10px">${ev.time}${nextDayTag}</span>
+        </span>
+        <span class="ev-icon" style="color:${col};font-size:15px">${emoji}${arrow}</span>
       </button>`;
     }).join('');
 
@@ -4674,6 +4712,9 @@ function updatePanelPositions() {
   if (eventsPanel) eventsPanel.style.left = (startLeft + 218 + 18 + 260 + 18 + 280 + 18) + 'px';
   if (libPanel)  { libPanel.style.left = startLeft + 'px'; libPanel.style.bottom = lift + 'px'; libPanel.style.maxHeight = panelH; }
   if (dock) dock.style.bottom = (tbH + 8) + 'px';
+  // Keep time-info-block floating just above the timeline
+  const tib = document.getElementById('time-info-block');
+  if (tib) tib.style.bottom = (tbH + 10) + 'px';
 }
 
 // ── AZIMUTH FINDER TOGGLE ─────────────────────────────────────────────────
@@ -4745,6 +4786,13 @@ function updateRiseSetStrip() {
 
 const RISE_SET_PAIRS = { sunRise:'sunSet', sunSet:'sunRise', moonRise:'moonSet', moonSet:'moonRise', mwRise:'mwSet', mwSet:'mwRise' };
 function toggleStripEvent(key) {
+  // Jump the slider to this event's time
+  const mins = stripEventTimes[key];
+  if (mins !== undefined && mins >= 0 && mins < 1440) {
+    sliderMinutes = mins;
+    syncSliderVisual();
+    updateTimeDisplay();
+  }
   const body = key.startsWith('sun') ? 'sun' : key.startsWith('moon') ? 'moon' : 'mw';
   const newHidden = !hiddenEvents[key];
   hiddenEvents[body + 'Rise'] = hiddenEvents[body + 'Set'] = newHidden;
